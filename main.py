@@ -262,7 +262,7 @@ class D2info:
         app.static('/static', './static')
         # app.url_for('static', filename='style.css', name='style')
         if self.args.production:
-            app.run(host='0.0.0.0', port=1423)
+            app.run(host='0.0.0.0', port=1423, ssl={'cert': self.args.cert, 'key': self.args.key})
         else:
             app.run()
 
