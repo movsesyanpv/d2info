@@ -1,0 +1,6 @@
+/.idea
+/app/__pycache__
+/venv
+/*.content
+/token.json
+api.json
