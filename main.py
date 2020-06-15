@@ -27,7 +27,12 @@ class D2info:
         api_data_file = open('api.json', 'r')
         self.api_data = json.loads(api_data_file.read())
         self.get_args()
-        self.oauth = BungieOAuth(self.api_data['id'], self.api_data['secret'], host='localhost', port='4200')
+        if self.args.production:
+
+            self.oauth = BungieOAuth(self.api_data['id'], self.api_data['secret'], context=(self.args.cert, self.args.key), host='0.0.0.0',
+                                     port='1423')
+        else:
+            self.oauth = BungieOAuth(self.api_data['id'], self.api_data['secret'], host='localhost', port='4200')
 
     async def token_update(self):
         # check to see if token.json exists, if not we have to start with oauth
@@ -256,7 +261,10 @@ class D2info:
 
         app.static('/static', './static')
         # app.url_for('static', filename='style.css', name='style')
-        app.run()
+        if self.args.production:
+            app.run(host='0.0.0.0', port='1423')
+        else:
+            app.run()
 
 
 if __name__ == '__main__':
