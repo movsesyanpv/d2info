@@ -120,7 +120,9 @@ class D2info:
                    '<link rel="icon" type="image/png" sizes="32x32" href="https://bungie.net//common/destiny2_content/icons/30c6cc828d7753bcca72748ba2aa83d6.png">\n')
 
         lang = 'ru'
-        page.write('<h2>{}</h2>\n'
+        page.write('<div class="global_grid">\n'
+                   '<div class="global_item">\n'
+                   '<h2>{}</h2>\n'
                    '<div class="wrapper">\n'.format('Популярные предметы за серебро'))
         for i, item in enumerate(tess_def['itemList']):
             if item['displayCategoryIndex'] == 3 and item['itemHash'] != 827183327:
@@ -144,9 +146,11 @@ class D2info:
                                                  item_def['displayProperties']['name'],
                                                  currency_resp['displayProperties']['icon'],
                                                  item['currencies'][0]['quantity']))
-        page.write('</div>\n')
+        page.write('</div>\n'
+                   '</div>\n')
 
-        page.write('<h2>{}</h2>\n'
+        page.write('<div class="global_item">\n'
+                   '<h2>{}</h2>\n'
                    '<div class="wrapper">\n'.format('Популярные предметы за яркую пыль'))
         for i, item in enumerate(tess_def['itemList']):
             if item['displayCategoryIndex'] == 4 and item['itemHash'] not in [353932628, 3260482534, 3536420626,
@@ -171,9 +175,11 @@ class D2info:
                                                  item_def['displayProperties']['name'],
                                                  currency_resp['displayProperties']['icon'],
                                                  item['currencies'][0]['quantity']))
-        page.write('</div>\n')
+        page.write('</div>\n'
+                   '</div>\n')
 
-        page.write('<h2>{}</h2>\n'
+        page.write('<div class="global_item">\n'
+                   '<h2>{}</h2>\n'
                    '<div class="wrapper">\n'.format('Предметы за яркую пыль'))
         for i, item in enumerate(tess_def['itemList']):
             if item['displayCategoryIndex'] == 9 and item['itemHash'] not in [353932628, 3260482534, 3536420626,
@@ -198,9 +204,11 @@ class D2info:
                                                  item_def['displayProperties']['name'],
                                                  currency_resp['displayProperties']['icon'],
                                                  item['currencies'][0]['quantity']))
-        page.write('</div>\n')
+        page.write('</div>\n'
+                   '</div>\n')
 
-        page.write('<h2>{}</h2>\n'
+        page.write('<div class="global_item">\n'
+                   '<h2>{}</h2>\n'
                    '<div class="wrapper">\n'.format('Потребляемые предметы за яркую пыль'))
         for i, item in enumerate(tess_def['itemList']):
             if item['displayCategoryIndex'] == 10 and item['itemHash'] not in [353932628, 3260482534, 3536420626,
@@ -225,7 +233,9 @@ class D2info:
                                                  item_def['displayProperties']['name'],
                                                  currency_resp['displayProperties']['icon'],
                                                  item['currencies'][0]['quantity']))
-        page.write('</div>\n')
+        page.write('</div>\n'
+                   '</div>\n'
+                   '</div>')
 
         page.close()
 
