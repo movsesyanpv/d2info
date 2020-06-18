@@ -10,6 +10,8 @@ import time
 import aiohttp
 import logging
 
+from errorh import CustomErrorHandler
+
 
 class D2info:
     version = '0.0.1'
@@ -264,6 +266,7 @@ class D2info:
             self.sched.start()
 
         app.static('/static', './static')
+        app.error_handler = CustomErrorHandler()
         # app.url_for('static', filename='style.css', name='style')
         if self.args.production:
             app.run(host='0.0.0.0', port=1423, workers=1, debug=False, access_log=False)  # ssl={'cert': self.args.cert, 'key': self.args.key})

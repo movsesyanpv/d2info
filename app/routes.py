@@ -20,6 +20,7 @@ async def item(request):
         screenshot = '<img class="screenshot" src="https://bungie.net{}">'.format(item_manifest['screenshot'])
     else:
         screenshot = '<img class="icon" src="https://bungie.net{}">'.format(item_manifest['displayProperties']['icon'])
+    await d2.close()
     return response.html('<!DOCTYPE html lang="ru">\n'
                          '<html lang="ru">\n'
                          '<meta name="theme-color" content="#222222">\n'

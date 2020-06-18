@@ -113,3 +113,16 @@ a.name {
 a.name:hover {
   text-decoration: underline;
 }
+
+.mono{
+	border: var(--bordcolor) 1px solid;
+	border-radius: 1px;
+	background-color: var(--formcolor);
+	padding-left: 10px;
+	padding-right: 10px;
+	font-family: monospace;
+}
+
+.error{
+	text-align: center;
+}
