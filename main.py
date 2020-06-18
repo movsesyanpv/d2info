@@ -29,7 +29,7 @@ class D2info:
         self.get_args()
         if self.args.production:
 
-            self.oauth = BungieOAuth(self.api_data['id'], self.api_data['secret'], context=(self.args.cert, self.args.key), host='0.0.0.0',
+            self.oauth = BungieOAuth(self.api_data['id'], self.api_data['secret'], # context=(self.args.cert, self.args.key), host='0.0.0.0',
                                      port='1423')
         else:
             self.oauth = BungieOAuth(self.api_data['id'], self.api_data['secret'], host='localhost', port='4200')
@@ -128,34 +128,6 @@ class D2info:
         page.write('<div class="global_grid">\n'
                    '<div class="global_item">\n'
                    '<h2>{}</h2>\n'
-                   '<div class="wrapper">\n'.format('Популярные предметы за серебро'))
-        for i, item in enumerate(tess_def['itemList']):
-            if item['displayCategoryIndex'] == 3 and item['itemHash'] != 827183327:
-                definition = 'DestinyInventoryItemDefinition'
-                item_def = await self.destiny.decode_hash(item['itemHash'], definition, language=lang)
-                currency_resp = await self.destiny.decode_hash(item['currencies'][0]['itemHash'], definition,
-                                                               language=lang)
-                page.write('    <div class="item">\n'
-                           '        <table>\n'
-                           '            <tr><td>\n'
-                           '                <img class="icon" src="https://bungie.net{}">\n'
-                           '            </td><td>\n'
-                           '                <b>{}</b>\n'
-                           '                <div class="cost">\n'
-                           '                    <img class="currency" src="https://bungie.net{}">\n'
-                           '                    <a>{}</a>\n'
-                           '                </div>\n'
-                           '            </td></tr>\n'
-                           '        </table>\n'
-                           '    </div>\n'.format(item_def['displayProperties']['icon'],
-                                                 item_def['displayProperties']['name'],
-                                                 currency_resp['displayProperties']['icon'],
-                                                 item['currencies'][0]['quantity']))
-        page.write('</div>\n'
-                   '</div>\n')
-
-        page.write('<div class="global_item">\n'
-                   '<h2>{}</h2>\n'
                    '<div class="wrapper">\n'.format('Популярные предметы за яркую пыль'))
         for i, item in enumerate(tess_def['itemList']):
             if item['displayCategoryIndex'] == 4 and item['itemHash'] not in [353932628, 3260482534, 3536420626,
@@ -239,6 +211,34 @@ class D2info:
                                                  currency_resp['displayProperties']['icon'],
                                                  item['currencies'][0]['quantity']))
         page.write('</div>\n'
+                   '</div>\n')
+
+        page.write('<div class="global_item">\n'
+                   '<h2>{}</h2>\n'
+                   '<div class="wrapper">\n'.format('Популярные предметы за серебро'))
+        for i, item in enumerate(tess_def['itemList']):
+            if item['displayCategoryIndex'] == 3 and item['itemHash'] != 827183327:
+                definition = 'DestinyInventoryItemDefinition'
+                item_def = await self.destiny.decode_hash(item['itemHash'], definition, language=lang)
+                currency_resp = await self.destiny.decode_hash(item['currencies'][0]['itemHash'], definition,
+                                                               language=lang)
+                page.write('    <div class="item">\n'
+                           '        <table>\n'
+                           '            <tr><td>\n'
+                           '                <img class="icon" src="https://bungie.net{}">\n'
+                           '            </td><td>\n'
+                           '                <b>{}</b>\n'
+                           '                <div class="cost">\n'
+                           '                    <img class="currency" src="https://bungie.net{}">\n'
+                           '                    <a>{}</a>\n'
+                           '                </div>\n'
+                           '            </td></tr>\n'
+                           '        </table>\n'
+                           '    </div>\n'.format(item_def['displayProperties']['icon'],
+                                                 item_def['displayProperties']['name'],
+                                                 currency_resp['displayProperties']['icon'],
+                                                 item['currencies'][0]['quantity']))
+        page.write('</div>\n'
                    '</div>\n'
                    '</div>')
 
@@ -262,7 +262,7 @@ class D2info:
         app.static('/static', './static')
         # app.url_for('static', filename='style.css', name='style')
         if self.args.production:
-            app.run(host='0.0.0.0', port=1423, ssl={'cert': self.args.cert, 'key': self.args.key})
+            app.run(host='0.0.0.0', port=1423, workers=1) # ssl={'cert': self.args.cert, 'key': self.args.key})
         else:
             app.run()
 
