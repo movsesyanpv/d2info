@@ -30,6 +30,8 @@ async def item(request):
                          '{}\n'
                          '<h3>{}</h3>\n'
                          '<a>{}</a><br>\n'
-                         '<button href="/eververse">Вернуться назад</button>'
+                         '<form method="get" action="/eververse">\n'
+                         '    <button type="submit">Вернуться назад</button>\n'
+                         '</form>\n'
                          .format(item_manifest['displayProperties']['name'], item_manifest['displayProperties']['icon'],
                                  screenshot, item_manifest['displayProperties']['name'], item_manifest['displayProperties']['description']))

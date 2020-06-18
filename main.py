@@ -171,7 +171,7 @@ class D2info:
                            '            <tr><td>\n'
                            '                <img class="icon" src="https://bungie.net{}">\n'
                            '            </td><td>\n'
-                           '                <b>{}</b>\n'
+                           '                <a class="name" href="/item/?hash={}"><b>{}</b></a>\n'
                            '                <div class="cost">\n'
                            '                    <img class="currency" src="https://bungie.net{}">\n'
                            '                    <a>{}</a>\n'
@@ -179,6 +179,7 @@ class D2info:
                            '            </td></tr>\n'
                            '        </table>\n'
                            '    </div>\n'.format(item_def['displayProperties']['icon'],
+                                                 item['itemHash'],
                                                  item_def['displayProperties']['name'],
                                                  currency_resp['displayProperties']['icon'],
                                                  item['currencies'][0]['quantity']))
@@ -200,7 +201,7 @@ class D2info:
                            '            <tr><td>\n'
                            '                <img class="icon" src="https://bungie.net{}">\n'
                            '            </td><td>\n'
-                           '                <b>{}</b>\n'
+                           '                <a class="name" href="/item/?hash={}"><b>{}</b></a>\n'
                            '                <div class="cost">\n'
                            '                    <img class="currency" src="https://bungie.net{}">\n'
                            '                    <a>{}</a>\n'
@@ -208,6 +209,7 @@ class D2info:
                            '            </td></tr>\n'
                            '        </table>\n'
                            '    </div>\n'.format(item_def['displayProperties']['icon'],
+                                                 item['itemHash'],
                                                  item_def['displayProperties']['name'],
                                                  currency_resp['displayProperties']['icon'],
                                                  item['currencies'][0]['quantity']))
@@ -228,7 +230,7 @@ class D2info:
                            '            <tr><td>\n'
                            '                <img class="icon" src="https://bungie.net{}">\n'
                            '            </td><td>\n'
-                           '                <b>{}</b>\n'
+                           '                <a class="name" href="/item/?hash={}"><b>{}</b></a>\n'
                            '                <div class="cost">\n'
                            '                    <img class="currency" src="https://bungie.net{}">\n'
                            '                    <a>{}</a>\n'
@@ -236,6 +238,7 @@ class D2info:
                            '            </td></tr>\n'
                            '        </table>\n'
                            '    </div>\n'.format(item_def['displayProperties']['icon'],
+                                                 item['itemHash'],
                                                  item_def['displayProperties']['name'],
                                                  currency_resp['displayProperties']['icon'],
                                                  item['currencies'][0]['quantity']))
