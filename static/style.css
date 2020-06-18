@@ -6,6 +6,7 @@
 	--formcolor: #efefef;
 	--bbordcolor: #eaeaea;
 	--bwidth: 1px;
+	--hovercolor: #e0e0e0;
 }
 
 @media (prefers-color-scheme: dark){
@@ -17,6 +18,7 @@
 	--formcolor: #2a2a2a;
 	--bbordcolor: gray;
 	--bwidth: 1px;
+	--hovercolor: #3a3a3a;
     }
 }
 
@@ -77,6 +79,37 @@ html {
 	max-width: 64px;
 }
 
+.screenshot {
+    max-height: 720px;
+    max-width: 100%
+}
+
+button {
+	border: none;
+    background-color: var(--formcolor);
+    color: var(--htmlcolor);
+    padding: 15px 32px;
+    text-align: center;
+    text-decoration: none;
+    display: inline-block;
+    font-size: 16px;
+    margin: 4px 2px;
+    cursor: pointer;
+}
+
+button:hover{
+	background-color: var(--hovercolor)
+}
+
 h2 {
 	text-align: center
+}
+
+a.name {
+	color: var(--tcolor);
+	text-decoration: none;
+}
+
+a.name:hover {
+  text-decoration: underline;
 }
