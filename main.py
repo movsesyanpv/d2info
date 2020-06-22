@@ -126,7 +126,17 @@ class D2info:
                    '<meta property="og:type" content="website" />\n'
                    '<meta property="og:url" content="https://d2info.happyv0dka.cloud/eververse" />\n'
                    '<meta property="og:image" content="https://bungie.net//common/destiny2_content/icons/30c6cc828d7753bcca72748ba2aa83d6.png" />\n'
-                   '<link rel="icon" type="image/png" sizes="32x32" href="https://bungie.net//common/destiny2_content/icons/30c6cc828d7753bcca72748ba2aa83d6.png">\n')
+                   '<link rel="icon" type="image/png" sizes="32x32" href="https://bungie.net//common/destiny2_content/icons/30c6cc828d7753bcca72748ba2aa83d6.png">\n'
+                   '<header class="header-fixed">\n'
+                   '    <div class="header-limiter">\n'
+                   '		<h1><a href="/">d2info</a></h1>\n'
+                   '		<nav>\n'
+                   '			<a href="/">Главная</a>\n'
+                   '			<a href="/eververse">Эверверс</a>\n'
+                   '		</nav>\n'
+                   '	</div>\n'
+                   '</header>\n'
+                   '<div class="header-fixed-placeholder"></div>\n')
 
         lang = 'ru'
         page.write('<div class="global_grid">\n'
@@ -146,10 +156,8 @@ class D2info:
                            '                <img alt="Item icon" class="icon" src="https://bungie.net{}">\n'
                            '            </td><td>\n'
                            '                <a class="name" href="/item/?hash={}"><b>{}</b></a><br>\n'
-                           # '                <div class="cost">\n'
                            '                    <img alt="Currency icon" class="currency" src="https://bungie.net{}">\n'
                            '                    <a>{}</a>\n'
-                           # '                </div>\n'
                            '            </td></tr>\n'
                            '        </table>\n'
                            '    </div>\n'.format(item_def['displayProperties']['icon'],
@@ -176,10 +184,8 @@ class D2info:
                            '                <img alt="Item icon" class="icon" src="https://bungie.net{}">\n'
                            '            </td><td>\n'
                            '                <a class="name" href="/item/?hash={}"><b>{}</b></a><br>\n'
-                           # '                <div class="cost">\n'
                            '                    <img alt="Currency icon" class="currency" src="https://bungie.net{}">\n'
                            '                    <a>{}</a>\n'
-                           # '                </div>\n'
                            '            </td></tr>\n'
                            '        </table>\n'
                            '    </div>\n'.format(item_def['displayProperties']['icon'],
@@ -206,10 +212,8 @@ class D2info:
                            '                <img alt="Item icon" class="icon" src="https://bungie.net{}">\n'
                            '            </td><td>\n'
                            '                <a class="name" href="/item/?hash={}"><b>{}</b></a><br>\n'
-                           # '                <div class="cost">\n'
                            '                    <img alt="Currency icon" class="currency" src="https://bungie.net{}">\n'
                            '                    <a>{}</a>\n'
-                           # '                </div>\n'
                            '            </td></tr>\n'
                            '        </table>\n'
                            '    </div>\n'.format(item_def['displayProperties']['icon'],
@@ -235,10 +239,8 @@ class D2info:
                            '                <img alt="Item icon" class="icon" src="https://bungie.net{}">\n'
                            '            </td><td>\n'
                            '                <a class="name" href="/item/?hash={}"><b>{}</b></a><br>\n'
-                           # '                <div class="cost">\n'
                            '                    <img alt="Currency icon" class="currency" src="https://bungie.net{}">\n'
                            '                    <a>{}</a>\n'
-                           # '                </div>\n'
                            '            </td></tr>\n'
                            '        </table>\n'
                            '    </div>\n'.format(item_def['displayProperties']['icon'],

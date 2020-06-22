@@ -43,7 +43,7 @@
 
 .global_grid {
 	display: grid;
-	margin: 0 auto;
+	margin: 8px;
 	max-width: 100%;
 	grid-gap: 20px;
 }
@@ -125,4 +125,130 @@ a.name:hover {
 
 .error{
 	text-align: center;
+}
+
+.mono{
+	border: var(--bordcolor) 1px solid;
+	border-radius: 1px;
+	background-color: var(--formcolor);
+	padding-left: 10px;
+	padding-right: 10px;
+	font-family: monospace;
+}
+
+.error{
+	text-align: center;
+}
+
+.header-fixed {
+	background-color: var(--formcolor);
+	box-shadow:0 1px 1px #ccc;
+	padding: 20px 40px;
+	width: 100%;
+	height: 80px;
+	color: var(--htmlcolor);
+	box-sizing: border-box;
+	top:0px;
+    position: sticky;
+	-webkit-transition:top 0.3s;
+	transition:top 0.3s;
+}
+
+.header-fixed .header-limiter {
+	max-width: 1200px;
+	text-align: center;
+	margin: 0 auto;
+}
+
+.header-fixed-placeholder{
+	height: 80px;
+	display: none;
+}
+
+.header-fixed .header-limiter h1 {
+	float: left;
+	font: normal 28px Cookie, Arial, Helvetica, sans-serif;
+	line-height: 40px;
+	margin: 0;
+}
+
+.header-fixed .header-limiter a {
+	color: var(--htmlcolor);
+	text-decoration: none;
+}
+
+.header-fixed .header-limiter nav {
+	font:16px Arial, Helvetica, sans-serif;
+	line-height: 40px;
+	float: right;
+}
+
+.header-fixed .header-limiter nav a{
+	display: inline-block;
+	padding: 0 5px;
+	text-decoration:none;
+	color: var(--htmlcolor);
+	opacity: 0.9;
+}
+
+.header-fixed .header-limiter nav a:hover{
+	opacity: 1;
+}
+
+body.fixed .header-fixed {
+	padding: 10px 40px;
+	height: 50px;
+	position: fixed;
+	width: 100%;
+	top: 0;
+	left: 0;
+	z-index: 1;
+}
+
+body.fixed .header-fixed-placeholder {
+	display: block;
+}
+
+body.fixed .header-fixed .header-limiter h1 {
+	font-size: 24px;
+	line-height: 30px;
+}
+
+body.fixed .header-fixed .header-limiter nav {
+	line-height: 28px;
+	font-size: 13px;
+}
+
+@media all and (max-width: 600px) {
+
+	.header-fixed {
+		padding: 20px 0;
+		height: 75px;
+	}
+
+	.header-fixed .header-limiter h1 {
+		float: none;
+		margin: 0px 0 10px;
+		text-align: center;
+		font-size: 24px;
+		line-height: 1;
+	}
+
+	.header-fixed .header-limiter nav {
+		line-height: 1;
+		float:none;
+	}
+
+	.header-fixed .header-limiter nav a {
+		font-size: 13px;
+	}
+
+	body.fixed .header-fixed {
+		display: none;
+	}
+
+}
+
+body {
+	margin: 0;
 }
