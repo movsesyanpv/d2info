@@ -10,6 +10,33 @@ async def eververse(request):
     return await response.file('static/ev.html')
 
 
+@app.route('/daily')
+async def daily(request):
+    return await response.file('static/daily.html')
+
+@app.route('/weekly')
+async def weekly(request):
+    return response.html('<!DOCTYPE html lang="ru">\n'
+                         '<html lang="ru">\n'
+                         '<meta name="theme-color" content="#222222">\n'
+                         '<meta name="viewport" content="width=device-width, initial-scale=1">\n'
+                         '<link rel="stylesheet" type="text/css" href="/static/style.css">\n'
+                         '<header class="header-fixed">\n'
+                         '    <div class="header-limiter">\n'
+                         '		<h1><a href="/">d2info</a></h1>\n'
+                         '		<nav>\n'
+                         '			<a href="/">Главная</a>\n'
+                         '            <a href="/daily">Сегодня</a>\n'
+                         '            <a href="/weekly">На этой неделе</a>\n'
+                         '			<a href="/eververse">Эверверс</a>\n'
+                         '		</nav>\n'
+                         '	</div>\n'
+                         '</header>\n'
+                         '<div class="header-fixed-placeholder"></div>\n'
+                         '<title>{}</title>\n'
+                         '<h2>Пока что данные не предоставляются</h2>'.format('На этой неделе'))
+
+
 @app.route('/item')
 async def item(request):
     api_data_file = open('api.json', 'r')
@@ -31,6 +58,8 @@ async def item(request):
                          '		<h1><a href="/">d2info</a></h1>\n'
                          '		<nav>\n'
                          '			<a href="/">Главная</a>\n'
+                         '            <a href="/daily">Сегодня</a>\n'
+                         '            <a href="/weekly">На этой неделе</a>\n'
                          '			<a href="/eververse">Эверверс</a>\n'
                          '		</nav>\n'
                          '	</div>\n'
