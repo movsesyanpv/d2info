@@ -7,6 +7,7 @@
 	--bbordcolor: #eaeaea;
 	--bwidth: 1px;
 	--hovercolor: #e0e0e0;
+	--hoverwidth: 320px;
 }
 
 @media (prefers-color-scheme: dark){
@@ -248,6 +249,10 @@ body.fixed .header-fixed .header-limiter nav {
 		display: none;
 	}
 
+    :root{
+	    --hoverwidth: 100%;
+    }
+
 }
 
 body {
@@ -259,14 +264,17 @@ body {
     visibility: hidden;
     position: absolute;
     padding: 5px;
-    max-width: 320px;
+    max-width: var(--hoverwidth);
     background: var(--formcolor);
     z-index: 10000;
     border: 1px solid var(--bordcolor);
-    /*box-shadow: 0 0 10px #000;*/
 }
 
 .icon:hover+.tooltip{
 	display:inline-block;
 	visibility:visible;
+}
+
+.screenshot_hover{
+    max-width: var(--hoverwidth);
 }
