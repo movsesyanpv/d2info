@@ -35,7 +35,7 @@
 
 .wrapper {
 	display: grid;
-	grid-template-columns: repeat(auto-fit, minmax(250px,1fr));
+	grid-template-columns: repeat(auto-fit, minmax(64px,1fr));
 	margin: 0 auto;
 	max-width: 1420px;
 	grid-gap: 5px;
@@ -72,6 +72,7 @@ html {
 	border: var(--bordcolor) 1px solid;
 	border-radius: 1px;
 	background-color: var(--formcolor);
+	margin-right: auto
 }
 
 .icon {
@@ -251,4 +252,21 @@ body.fixed .header-fixed .header-limiter nav {
 
 body {
 	margin: 0;
+}
+
+.tooltip {
+    display: none;
+    visibility: hidden;
+    position: absolute;
+    padding: 5px;
+    max-width: 320px;
+    background: var(--formcolor);
+    z-index: 10000;
+    border: 1px solid var(--bordcolor);
+    /*box-shadow: 0 0 10px #000;*/
+}
+
+.icon:hover+.tooltip{
+	display:inline-block;
+	visibility:visible;
 }

@@ -1,4 +1,5 @@
 from sanic import Sanic
+from jinja2 import Environment, PackageLoader, select_autoescape
 from apscheduler.schedulers.asyncio import AsyncIOScheduler
 from bungied2auth import BungieOAuth
 import json
@@ -132,6 +133,8 @@ class D2info:
                    '<meta name="theme-color" content="#222222">\n'
                    '<meta name="viewport" content="width=device-width, initial-scale=1">\n'
                    '<link rel="stylesheet" type="text/css" href="/static/style.css">\n'
+                   '<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>\n'
+                   '<script src="/static/d2info.js"></script>\n'
                    '<meta charset="UTF8">\n'
                    '<meta name="description" content="Сезонный ассортимент Эверверс"/>\n'
                    '<meta property="og:description" content="Предметы, которые будут продаваться в этом сезоне у Тесс Эверис" />\n'
@@ -165,17 +168,16 @@ class D2info:
                 item_def = await self.destiny.decode_hash(item['itemHash'], definition, language=lang)
                 currency_resp = await self.destiny.decode_hash(item['currencies'][0]['itemHash'], definition,
                                                                language=lang)
-                page.write('    <div class="item">\n'
-                           '        <table>\n'
-                           '            <tr><td>\n'
+                page.write('    <div class="item" id="{}_4">\n'
                            '                <img alt="Item icon" class="icon" src="https://bungie.net{}">\n'
-                           '            </td><td>\n'
+                           '            <div class="tooltip" id="{}_4_tooltip" style="left: auto">\n'
                            '                <a class="name" href="/item/?hash={}"><b>{}</b></a><br>\n'
                            '                    <img alt="Currency icon" class="currency" src="https://bungie.net{}">\n'
                            '                    <a>{}</a>\n'
-                           '            </td></tr>\n'
-                           '        </table>\n'
-                           '    </div>\n'.format(item_def['displayProperties']['icon'],
+                           '            </div>\n'
+                           '    </div>\n'.format(item['itemHash'],
+                                                 item_def['displayProperties']['icon'],
+                                                 item['itemHash'],
                                                  item['itemHash'],
                                                  item_def['displayProperties']['name'],
                                                  currency_resp['displayProperties']['icon'],
@@ -193,17 +195,16 @@ class D2info:
                 item_def = await self.destiny.decode_hash(item['itemHash'], definition, language=lang)
                 currency_resp = await self.destiny.decode_hash(item['currencies'][0]['itemHash'], definition,
                                                                language=lang)
-                page.write('    <div class="item">\n'
-                           '        <table>\n'
-                           '            <tr><td>\n'
+                page.write('    <div class="item" id="{}_9">\n'
                            '                <img alt="Item icon" class="icon" src="https://bungie.net{}">\n'
-                           '            </td><td>\n'
+                           '            <div class="tooltip" id="{}_9_tooltip" style="left: auto">\n'
                            '                <a class="name" href="/item/?hash={}"><b>{}</b></a><br>\n'
                            '                    <img alt="Currency icon" class="currency" src="https://bungie.net{}">\n'
                            '                    <a>{}</a>\n'
-                           '            </td></tr>\n'
-                           '        </table>\n'
-                           '    </div>\n'.format(item_def['displayProperties']['icon'],
+                           '            </div>\n'
+                           '    </div>\n'.format(item['itemHash'],
+                                                 item_def['displayProperties']['icon'],
+                                                 item['itemHash'],
                                                  item['itemHash'],
                                                  item_def['displayProperties']['name'],
                                                  currency_resp['displayProperties']['icon'],
@@ -221,17 +222,16 @@ class D2info:
                 item_def = await self.destiny.decode_hash(item['itemHash'], definition, language=lang)
                 currency_resp = await self.destiny.decode_hash(item['currencies'][0]['itemHash'], definition,
                                                                language=lang)
-                page.write('    <div class="item">\n'
-                           '        <table>\n'
-                           '            <tr><td>\n'
+                page.write('    <div class="item" id="{}_10">\n'
                            '                <img alt="Item icon" class="icon" src="https://bungie.net{}">\n'
-                           '            </td><td>\n'
+                           '            <div class="tooltip" id="{}_10_tooltip" style="left: auto">\n'
                            '                <a class="name" href="/item/?hash={}"><b>{}</b></a><br>\n'
                            '                    <img alt="Currency icon" class="currency" src="https://bungie.net{}">\n'
                            '                    <a>{}</a>\n'
-                           '            </td></tr>\n'
-                           '        </table>\n'
-                           '    </div>\n'.format(item_def['displayProperties']['icon'],
+                           '            </div>\n'
+                           '    </div>\n'.format(item['itemHash'],
+                                                 item_def['displayProperties']['icon'],
+                                                 item['itemHash'],
                                                  item['itemHash'],
                                                  item_def['displayProperties']['name'],
                                                  currency_resp['displayProperties']['icon'],
@@ -248,24 +248,24 @@ class D2info:
                 item_def = await self.destiny.decode_hash(item['itemHash'], definition, language=lang)
                 currency_resp = await self.destiny.decode_hash(item['currencies'][0]['itemHash'], definition,
                                                                language=lang)
-                page.write('    <div class="item">\n'
-                           '        <table>\n'
-                           '            <tr><td>\n'
+                page.write('    <div class="item" id="{}_3">\n'
                            '                <img alt="Item icon" class="icon" src="https://bungie.net{}">\n'
-                           '            </td><td>\n'
+                           '            <div class="tooltip" id="{}_3_tooltip" style="left: auto">\n'
                            '                <a class="name" href="/item/?hash={}"><b>{}</b></a><br>\n'
                            '                    <img alt="Currency icon" class="currency" src="https://bungie.net{}">\n'
                            '                    <a>{}</a>\n'
-                           '            </td></tr>\n'
-                           '        </table>\n'
-                           '    </div>\n'.format(item_def['displayProperties']['icon'],
+                           '            </div>\n'
+                           '    </div>\n'.format(item['itemHash'],
+                                                 item_def['displayProperties']['icon'],
+                                                 item['itemHash'],
                                                  item['itemHash'],
                                                  item_def['displayProperties']['name'],
                                                  currency_resp['displayProperties']['icon'],
                                                  item['currencies'][0]['quantity']))
         page.write('</div>\n'
                    '</div>\n'
-                   '</div>')
+                   '</div>\n'
+                   '<script>enableTooltips()</script>')
 
         page.close()
 

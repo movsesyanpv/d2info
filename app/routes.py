@@ -2,17 +2,30 @@ from app import app
 from sanic import response
 import pydest
 import json
+from jinja2 import Environment, PackageLoader, select_autoescape
+
+
+template_env = Environment(
+    loader=PackageLoader('templates'),
+    autoescape=select_autoescape(['html', 'xml']),
+    enable_async=True
+)
 
 
 @app.route('/')
 @app.route('/eververse')
 async def eververse(request):
+    # template = template_env.get_template("ev.html")
+    # rendered_template = await template.render_async(
+    #     knights='that say nih; asynchronously')
+    # return response.html(rendered_template)
     return await response.file('static/ev.html')
 
 
 @app.route('/daily')
 async def daily(request):
     return await response.file('static/daily.html')
+
 
 @app.route('/weekly')
 async def weekly(request):

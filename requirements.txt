@@ -3,3 +3,4 @@ bungie-d2-oauth>=0.0.5
 APScheduler
 pydest
 aiohttp
+jinja2
