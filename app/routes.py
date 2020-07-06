@@ -5,11 +5,11 @@ import json
 from jinja2 import Environment, PackageLoader, select_autoescape
 
 
-template_env = Environment(
-    loader=PackageLoader('templates'),
-    autoescape=select_autoescape(['html', 'xml']),
-    enable_async=True
-)
+# template_env = Environment(
+#     loader=PackageLoader('templates'),
+#     autoescape=select_autoescape(['html', 'xml']),
+#     enable_async=True
+# )
 
 
 @app.route('/')
