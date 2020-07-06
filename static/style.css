@@ -23,12 +23,12 @@
     }
 }
 
-@media (max-width: 1420px){
+@media (max-width: 1000px){
     .global_grid {
     	grid-template-columns: repeat(1, minmax(250px,1fr));
     }
 }
-@media (min-width: 1421px){
+@media (min-width: 1001px){
 	.global_grid {
 		grid-template-columns: repeat(2, minmax(250px,1fr));
     }
