@@ -1,0 +1,20 @@
+<!DOCTYPE html lang="ru">
+<html lang="ru">
+<title>{% block title %}{% endblock %}</title>
+<meta name="theme-color" content="#222222">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="stylesheet" type="text/css" href="/static/style.css">
+<meta charset="UTF8">
+<header class="header-fixed">
+    <div class="header-limiter">
+		<h1><a href="/">d2info</a></h1>
+		<nav>
+			<a href="/">Главная</a>
+            <a href="/daily">Сегодня</a>
+            <a href="/weekly">На этой неделе</a>
+			<a href="/eververse">Эверверс</a>
+		</nav>
+	</div>
+</header>
+<div class="header-fixed-placeholder"></div>
+{% block content %}{% endblock %}
