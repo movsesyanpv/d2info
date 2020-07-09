@@ -574,6 +574,8 @@ class D2info:
             self.sched.add_job(self.token_update, 'interval', hours=1)
             self.sched.add_job(self.get_seasonal_eververse, 'cron', day_of_week='tue', hour='17', minute='1',
                                second='40', misfire_grace_time=86300)
+            self.sched.add_job(self.get_weekly_rotations, 'cron', day_of_week='tue', hour='17', minute='0',
+                               second='40', misfire_grace_time=86300)
             self.sched.add_job(self.get_daily_rotations, 'cron', hour='17', minute='0', second='40',
                                misfire_grace_time=86300)
             self.sched.start()
