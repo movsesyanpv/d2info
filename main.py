@@ -319,19 +319,20 @@ class D2info:
 
         lang = 'ru'
         rotations = []
-        activities_json = activities_resp
-        modifiers = []
-        for key in activities_json['Response']['activities']['data']['availableActivities']:
-            item_hash = key['activityHash']
-            definition = 'DestinyActivityDefinition'
-            r_json = await self.destiny.decode_hash(item_hash, definition, language=lang)
+        if activities_resp:
+            activities_json = activities_resp
+            modifiers = []
+            for key in activities_json['Response']['activities']['data']['availableActivities']:
+                item_hash = key['activityHash']
+                definition = 'DestinyActivityDefinition'
+                r_json = await self.destiny.decode_hash(item_hash, definition, language=lang)
 
-            if 'Ежедневная героическая сюжетная миссия: ' in r_json['displayProperties']['name']:
-                modifiers = await self.decode_modifiers(key, lang)
-        rotations.append({
-            'name': 'Модификаторы плейлиста налетов',
-            'items': modifiers
-        })
+                if 'Ежедневная героическая сюжетная миссия: ' in r_json['displayProperties']['name']:
+                    modifiers = await self.decode_modifiers(key, lang)
+            rotations.append({
+                'name': 'Модификаторы плейлиста налетов',
+                'items': modifiers
+            })
 
         spider_url = 'https://www.bungie.net/platform/Destiny2/{}/Profile/{}/Character/{}/Vendors/863940356/'. \
             format(char_info['platform'], char_info['membershipid'], char_info['charid'][0])
@@ -353,6 +354,44 @@ class D2info:
         self.data_cursor.execute('''DROP TABLE dailyrotations''')
         self.data_cursor.execute('''CREATE TABLE "dailyrotations" ("items"	TEXT)''')
         self.data_cursor.execute('''INSERT into dailyrotations VALUES (?)''', (str(rotations),))
+        self.data_db.commit()
+
+    async def get_weekly_rotations(self):
+        rotations = []
+        lang = 'ru'
+
+        activities_resp = await self.get_activities_response('nightfalls820', string='820 nightfalls')
+        if activities_resp:
+            activities_json = activities_resp
+            nightfalls = []
+            for key in activities_json['Response']['activities']['data']['availableActivities']:
+                item_hash = key['activityHash']
+                definition = 'DestinyActivityDefinition'
+                r_json = await self.destiny.decode_hash(item_hash, definition, language=lang)
+                try:
+                    recommended_light = key['recommendedLight']
+                    if recommended_light == 820:
+                        if r_json['matchmaking']['requiresGuardianOath']:
+                            info = {
+                                'name': 'Сумрак с гидом',
+                                'description': r_json['selectionScreenDisplayProperties']['name']
+                            }
+                        else:
+                            info = {
+                                'name': r_json['selectionScreenDisplayProperties']['name'],
+                                'description': r_json['selectionScreenDisplayProperties']['description']
+                            }
+                        nightfalls.append(info)
+                except KeyError:
+                    pass
+            rotations.append({
+                'name': 'Сумрачные налеты',
+                'items': nightfalls
+            })
+
+        self.data_cursor.execute('''DROP TABLE weeklyrotations''')
+        self.data_cursor.execute('''CREATE TABLE "weeklyrotations" ("items"	TEXT)''')
+        self.data_cursor.execute('''INSERT into weeklyrotations VALUES (?)''', (str(rotations),))
         self.data_db.commit()
 
     async def decode_modifiers(self, key, lang):
@@ -524,6 +563,7 @@ class D2info:
         await self.get_chars()
         await self.get_seasonal_eververse()
         await self.get_daily_rotations()
+        await self.get_weekly_rotations()
 
     def start_up(self):
 
