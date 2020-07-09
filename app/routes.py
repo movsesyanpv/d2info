@@ -2,54 +2,44 @@ from app import app, jinja
 from sanic import response
 import pydest
 import json
-from jinja2 import Environment, PackageLoader, select_autoescape
-
-
-# template_env = Environment(
-#     loader=PackageLoader('templates'),
-#     autoescape=select_autoescape(['html', 'xml']),
-#     enable_async=True
-# )
+import sqlite3
 
 
 @app.route('/')
 @app.route('/eververse')
 @jinja.template('ev.html')
 async def eververse(request):
-    # template = template_env.get_template("ev.html")
-    # rendered_template = await template.render_async(
-    #     knights='that say nih; asynchronously')
-    # return response.html(rendered_template)
-    # return await response.file('static/ev.html')
     return {}
 
 
 @app.route('/daily')
+@jinja.template('daily.html')
 async def daily(request):
-    return await response.file('static/daily.html')
+    data_db = sqlite3.connect('data.db')
+    data_cursor = data_db.cursor()
+    data_cursor.execute('''SELECT items FROM dailyrotations''')
+    items = data_cursor.fetchone()[0]
+    if items is not None:
+        items = eval(items)
+    else:
+        items = {
+            'name': 'Нет данных. Проверьте позднее.',
+            'items': []
+        }
+    return jinja.render('daily.html', request, global_items=items)
 
 
 @app.route('/weekly')
+@jinja.template('weekly.html')
 async def weekly(request):
-    return response.html('<!DOCTYPE html lang="ru">\n'
-                         '<html lang="ru">\n'
-                         '<meta name="theme-color" content="#222222">\n'
-                         '<meta name="viewport" content="width=device-width, initial-scale=1">\n'
-                         '<link rel="stylesheet" type="text/css" href="/static/style.css">\n'
-                         '<header class="header-fixed">\n'
-                         '    <div class="header-limiter">\n'
-                         '		<h1><a href="/">d2info</a></h1>\n'
-                         '		<nav>\n'
-                         '			<a href="/">Главная</a>\n'
-                         '            <a href="/daily">Сегодня</a>\n'
-                         '            <a href="/weekly">На этой неделе</a>\n'
-                         '			<a href="/eververse">Эверверс</a>\n'
-                         '		</nav>\n'
-                         '	</div>\n'
-                         '</header>\n'
-                         '<div class="header-fixed-placeholder"></div>\n'
-                         '<title>{}</title>\n'
-                         '<h2>Пока что данные не предоставляются</h2>'.format('На этой неделе'))
+    global_items = [
+        {
+            'name': 'Пока что данные не предоставляются',
+            'items': []
+        }
+    ]
+
+    return jinja.render('weekly.html', request, global_items=global_items)
 
 
 @app.route('/item')

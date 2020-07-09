@@ -10,6 +10,7 @@ import codecs
 import time
 import aiohttp
 import logging
+import sqlite3
 from urllib.parse import quote
 
 from errorh import CustomErrorHandler
@@ -24,6 +25,8 @@ class D2info:
     token = {}
     char_info = {}
     session = ''
+    data_db = sqlite3.connect('data.db')
+    data_cursor = data_db.cursor()
 
     vendor_params = {
         'components': '400,401,402'
@@ -49,6 +52,15 @@ class D2info:
                                      port='1423')
         else:
             self.oauth = BungieOAuth(self.api_data['id'], self.api_data['secret'], host='localhost', port='4200')
+        try:
+            self.data_cursor.execute('''CREATE TABLE "dailyrotations" ("items"	TEXT)''')
+        except sqlite3.OperationalError:
+            pass
+        try:
+            self.data_cursor.execute('''CREATE TABLE "weeklyrotations" ("items"	TEXT)''')
+        except sqlite3.OperationalError:
+            pass
+        self.data_db.commit()
 
     async def token_update(self):
         # check to see if token.json exists, if not we have to start with oauth
@@ -302,40 +314,11 @@ class D2info:
         page.close()
 
     async def get_daily_rotations(self):
+        char_info = self.char_info
         activities_resp = await self.get_activities_response('vanguardstrikes', string='strike modifiers')
 
-        page = codecs.open('static/daily.html', 'w', encoding='UTF8')
-        page.write('<!DOCTYPE html lang="ru">\n'
-                   '<html lang="ru">\n'
-                   '<title>Сегодня в игре</title>\n'
-                   '<meta name="theme-color" content="#222222">\n'
-                   '<meta name="viewport" content="width=device-width, initial-scale=1">\n'
-                   '<link rel="stylesheet" type="text/css" href="/static/style.css">\n'
-                   '<meta charset="UTF8">\n'
-                   '<meta name="description" content="Информация о ежедневном сбросе Destiny 2"/>\n'
-                   '<meta property="og:description" content="Информация о ежедневном сбросе Destiny 2" />\n'
-                   '<meta property="og:title" content="Сегодня в игре" />\n'
-                   '<meta property="og:type" content="website" />\n'
-                   '<meta property="og:url" content="https://d2info.happyv0dka.cloud/daily" />\n'
-                   '<meta property="og:image" content="https://bungie.net//common/destiny2_content/icons/30c6cc828d7753bcca72748ba2aa83d6.png" />\n'
-                   '<link rel="icon" type="image/png" sizes="32x32" href="https://bungie.net//common/destiny2_content/icons/30c6cc828d7753bcca72748ba2aa83d6.png">\n'
-                   '<header class="header-fixed">\n'
-                   '    <div class="header-limiter">\n'
-                   '		<h1><a href="/">d2info</a></h1>\n'
-                   '		<nav>\n'
-                   '			<a href="/">Главная</a>\n'
-                   '            <a href="/daily">Сегодня</a>\n'
-                   '            <a href="/weekly">На этой неделе</a>\n'
-                   '			<a href="/eververse">Эверверс</a>\n'
-                   '		</nav>\n'
-                   '	</div>\n'
-                   '</header>\n'
-                   '<div class="header-fixed-placeholder"></div>\n')
         lang = 'ru'
-        page.write('<div class="global_grid">\n'
-                   '<div class="global_item">\n'
-                   '<h2>{}</h2>\n'
-                   '<div class="wrapper">\n'.format('Модификаторы плейлиста налетов'))
+        rotations = []
         activities_json = activities_resp
         modifiers = []
         for key in activities_json['Response']['activities']['data']['availableActivities']:
@@ -345,23 +328,32 @@ class D2info:
 
             if 'Ежедневная героическая сюжетная миссия: ' in r_json['displayProperties']['name']:
                 modifiers = await self.decode_modifiers(key, lang)
-        for mod in modifiers:
-            page.write('    <div class="item">\n'
-                       '        <table>\n'
-                       '            <tr><td>\n'
-                       '                <img alt="Item icon" class="icon" src="https://bungie.net{}">\n'
-                       '            </td><td>\n'
-                       '                <a class="name"><b>{}</b></a><br>\n'
-                       '                    <a>{}</a>\n'
-                       '            </td></tr>\n'
-                       '        </table>\n'
-                       '    </div>\n'.format(mod['icon'],
-                                             mod['name'],
-                                             mod['description']))
-        page.write('</div>\n'
-                   '</div>\n'
-                   '</div>')
-        page.close()
+        rotations.append({
+            'name': 'Модификаторы плейлиста налетов',
+            'items': modifiers
+        })
+
+        spider_url = 'https://www.bungie.net/platform/Destiny2/{}/Profile/{}/Character/{}/Vendors/863940356/'. \
+            format(char_info['platform'], char_info['membershipid'], char_info['charid'][0])
+        spider_resp = await self.get_bungie_json('spider', spider_url, self.vendor_params, string='spider')
+        if spider_resp:
+            spider_json = spider_resp
+            spider_cats = spider_json['Response']['categories']['data']['categories']
+            spider_def = await self.destiny.decode_hash(863940356, 'DestinyVendorDefinition', language=lang)
+
+            items_to_get = spider_cats[0]['itemIndexes']
+
+            spider = await self.get_vendor_sales(lang, spider_resp, items_to_get, [1812969468])
+
+            rotations.append({
+                'name': 'Паук',
+                'items': spider
+            })
+
+        self.data_cursor.execute('''DROP TABLE dailyrotations''')
+        self.data_cursor.execute('''CREATE TABLE "dailyrotations" ("items"	TEXT)''')
+        self.data_cursor.execute('''INSERT into dailyrotations VALUES (?)''', (str(rotations),))
+        self.data_db.commit()
 
     async def decode_modifiers(self, key, lang):
         data = []
@@ -383,6 +375,38 @@ class D2info:
             format(char_info['platform'], char_info['membershipid'], char_info['charid'][0])
         activities_resp = await self.get_bungie_json(name, activities_url, self.activities_params, lang, string)
         return activities_resp
+
+    async def get_vendor_sales(self, lang, vendor_resp, cats, exceptions=[]):
+        embed_sales = []
+
+        vendor_json = vendor_resp
+        tess_sales = vendor_json['Response']['sales']['data']
+        for key in cats:
+            item = tess_sales[str(key)]
+            item_hash = item['itemHash']
+            if item_hash not in exceptions:
+                definition = 'DestinyInventoryItemDefinition'
+                item_resp = await self.destiny.decode_hash(item_hash, definition, language=lang)
+                item_name_list = item_resp['displayProperties']['name'].split()
+                item_name = ' '.join(item_name_list)
+                if len(item['costs']) > 0:
+                    currency = item['costs'][0]
+                    currency_resp = await self.destiny.decode_hash(currency['itemHash'], definition, language=lang)
+
+                    currency_cost = str(currency['quantity'])
+                    currency_item = currency_resp['displayProperties']['name']
+                else:
+                    currency_cost = 'N/A'
+                    currency_item = ''
+
+                item_data = {
+                    'icon': item_resp['displayProperties']['icon'],
+                    'name': item_name.capitalize(),
+                    'description': "{}: {} {}".format('Цена', currency_cost,
+                                                currency_item.capitalize())
+                }
+                embed_sales.append(item_data)
+        return embed_sales
 
     async def get_bungie_json(self, name, url, params=None, lang=None, string=None, change_msg=True):
         session = aiohttp.ClientSession()

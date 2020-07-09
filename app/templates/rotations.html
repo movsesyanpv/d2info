@@ -1,0 +1,34 @@
+{% extends 'base.html' %}
+
+{% block head %}{% endblock %}
+
+{% block content %}
+<div class="global_grid">
+    {% for global_item in global_items %}
+    <div class="global_item">
+        <h2>{{ global_item['name'] }}</h2>
+        <div class="mod_wrapper">
+            {% for item in global_item['items'] %}
+            <div class="item">
+                <table>
+                    <tbody>
+                    <tr>
+                        <td>
+                            {% if 'icon' in item %}
+                            <img class="mod_icon icon" src="https://bungie.net/{{item['icon']}}">
+                            {% endif %}
+                        </td>
+                        <td>
+                            <a class="name"><b>{{ item['name'] }}</b></a><br>
+                            <a>{{ item['description'] }}</a>
+                        </td>
+                    </tr>
+                    </tbody>
+                </table>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+    {% endfor %}
+</div>
+{% endblock %}

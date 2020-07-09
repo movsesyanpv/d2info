@@ -42,6 +42,14 @@
 	grid-gap: 5px;
 }
 
+.mod_wrapper {
+	display: flexbox;
+/* 	grid-template-columns: repeat(auto-fit, minmax(64px,1fr)); */
+	margin: 0 auto;
+	max-width: 600px;
+/* 	grid-gap: 5px; */
+}
+
 .global_grid {
 	display: grid;
 	margin: 8px;
