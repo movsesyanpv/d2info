@@ -18,9 +18,9 @@ async def daily(request):
     data_db = sqlite3.connect('data.db')
     data_cursor = data_db.cursor()
     data_cursor.execute('''SELECT items FROM dailyrotations''')
-    items = data_cursor.fetchone()[0]
+    items = data_cursor.fetchone()
     if items is not None:
-        items = eval(items)
+        items = eval(items[0])
     else:
         items = {
             'name': 'Нет данных. Проверьте позднее.',
@@ -32,14 +32,19 @@ async def daily(request):
 @app.route('/weekly')
 @jinja.template('weekly.html')
 async def weekly(request):
-    global_items = [
-        {
-            'name': 'Пока что данные не предоставляются',
+    data_db = sqlite3.connect('data.db')
+    data_cursor = data_db.cursor()
+    data_cursor.execute('''SELECT items FROM weeklyrotations''')
+    items = data_cursor.fetchone()
+    if items is not None:
+        items = eval(items[0])
+    else:
+        items = [{
+            'name': 'Нет данных, или они пока что не предоставляются. Проверьте позднее.',
             'items': []
-        }
-    ]
+        }]
 
-    return jinja.render('weekly.html', request, global_items=global_items)
+    return jinja.render('weekly.html', request, global_items=items)
 
 
 @app.route('/item')
