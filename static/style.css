@@ -286,3 +286,13 @@ body {
 .screenshot_hover{
     max-width: var(--hoverwidth);
 }
+
+.footer {
+    position:static;
+    bottom: 0;
+    height: fit-content;
+    background: var(--formcolor);
+    padding: 5px 0 5px 0;
+    width: 100%;
+    margin-bottom: -100px;
+}

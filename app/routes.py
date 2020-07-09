@@ -7,6 +7,11 @@ import markdown2
 
 
 @app.route('/')
+@jinja.template('index.html')
+async def index(request):
+    return {}
+
+
 @app.route('/eververse')
 @jinja.template('ev.html')
 async def eververse(request):
