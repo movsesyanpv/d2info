@@ -4,3 +4,5 @@ APScheduler
 pydest
 aiohttp
 jinja2
+sanic-jinja2
+sanic-session

@@ -1,4 +1,4 @@
-from app import app
+from app import app, jinja
 from sanic import response
 import pydest
 import json
@@ -14,12 +14,14 @@ from jinja2 import Environment, PackageLoader, select_autoescape
 
 @app.route('/')
 @app.route('/eververse')
+@jinja.template('ev.html')
 async def eververse(request):
     # template = template_env.get_template("ev.html")
     # rendered_template = await template.render_async(
     #     knights='that say nih; asynchronously')
     # return response.html(rendered_template)
-    return await response.file('static/ev.html')
+    # return await response.file('static/ev.html')
+    return {}
 
 
 @app.route('/daily')

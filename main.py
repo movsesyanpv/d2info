@@ -1,5 +1,5 @@
 from sanic import Sanic
-from jinja2 import Environment, PackageLoader, select_autoescape
+from sanic_jinja2 import SanicJinja2
 from apscheduler.schedulers.asyncio import AsyncIOScheduler
 from bungied2auth import BungieOAuth
 import json
@@ -126,16 +126,14 @@ class D2info:
     async def get_seasonal_eververse(self):
         tess_def = await self.destiny.decode_hash(3361454721, 'DestinyVendorDefinition')
 
-        page = codecs.open('static/ev.html', 'w', encoding='UTF8')
-        page.write('<!DOCTYPE html lang="ru">\n'
-                   '<html lang="ru">\n'
-                   '<title>Сезонный Эверверс</title>\n'
-                   '<meta name="theme-color" content="#222222">\n'
-                   '<meta name="viewport" content="width=device-width, initial-scale=1">\n'
-                   '<link rel="stylesheet" type="text/css" href="/static/style.css">\n'
+        page = codecs.open('app/templates/ev.html', 'w', encoding='UTF8')
+        page.write('{% extends \'base.html\' %}'
+                   '{% block title %}Сезонный Эверверс{% endblock %}\n'
+                   '{% block scripts %}'
                    '<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.5.1/jquery.min.js" defer></script>\n'
                    '<script src="/static/d2info.js" defer></script>\n'
-                   '<meta charset="UTF8">\n'
+                   '{% endblock %}'
+                   '{% block meta %}'
                    '<meta name="description" content="Сезонный ассортимент Эверверс"/>\n'
                    '<meta property="og:description" content="Предметы, которые будут продаваться в этом сезоне у Тесс Эверис" />\n'
                    '<meta property="og:title" content="Сезонный Эверверс" />\n'
@@ -143,21 +141,11 @@ class D2info:
                    '<meta property="og:url" content="https://d2info.happyv0dka.cloud/eververse" />\n'
                    '<meta property="og:image" content="https://bungie.net//common/destiny2_content/icons/30c6cc828d7753bcca72748ba2aa83d6.png" />\n'
                    '<link rel="icon" type="image/png" sizes="32x32" href="https://bungie.net//common/destiny2_content/icons/30c6cc828d7753bcca72748ba2aa83d6.png">\n'
-                   '<header class="header-fixed">\n'
-                   '    <div class="header-limiter">\n'
-                   '		<h1><a href="/">d2info</a></h1>\n'
-                   '		<nav>\n'
-                   '			<a href="/">Главная</a>\n'
-                   '            <a href="/daily">Сегодня</a>\n'
-                   '            <a href="/weekly">На этой неделе</a>\n'
-                   '			<a href="/eververse">Эверверс</a>\n'
-                   '		</nav>\n'
-                   '	</div>\n'
-                   '</header>\n'
-                   '<div class="header-fixed-placeholder"></div>\n')
+                   '{% endblock %}')
 
         lang = 'ru'
-        page.write('<div class="global_grid">\n'
+        page.write('{{% block content %}}'
+                   '<div class="global_grid">\n'
                    '<div class="global_item">\n'
                    '<h2>{}</h2>\n'
                    '<div class="wrapper">\n'.format('Популярные предметы за яркую пыль'))
@@ -308,7 +296,8 @@ class D2info:
 
         page.write('</div>\n'
                    '</div>\n'
-                   '</div>\n')
+                   '</div>\n'
+                   '{% endblock %}')
 
         page.close()
 
