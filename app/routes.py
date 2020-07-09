@@ -3,6 +3,7 @@ from sanic import response
 import pydest
 import json
 import sqlite3
+import markdown2
 
 
 @app.route('/')
@@ -45,6 +46,39 @@ async def weekly(request):
         }]
 
     return jinja.render('weekly.html', request, global_items=items)
+
+
+@app.route('/api')
+@jinja.template('api.html')
+async def api(request):
+    md = markdown2.markdown_path('app/templates/api.md')
+    return jinja.render('api.html', request, md=md)
+
+
+@app.route('/api/dailyrotations')
+async def dailyrotations(request):
+    data_db = sqlite3.connect('data.db')
+    data_cursor = data_db.cursor()
+    data_cursor.execute('''SELECT items FROM dailyrotations''')
+    items = data_cursor.fetchone()
+    if items is not None:
+        items = eval(items[0])
+    else:
+        items = []
+    return response.json({'Response': json.dumps(items, ensure_ascii=False)})
+
+
+@app.route('/api/weeklyrotations')
+async def dailyrotations(request):
+    data_db = sqlite3.connect('data.db')
+    data_cursor = data_db.cursor()
+    data_cursor.execute('''SELECT items FROM weeklyrotations''')
+    items = data_cursor.fetchone()
+    if items is not None:
+        items = eval(items[0])
+    else:
+        items = []
+    return response.json({'Response': json.dumps(items, ensure_ascii=False)})
 
 
 @app.route('/item')

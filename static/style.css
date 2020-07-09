@@ -115,7 +115,7 @@ h2 {
 	text-align: center
 }
 
-a.name {
+a.name, a {
 	color: var(--tcolor);
 	text-decoration: none;
 }

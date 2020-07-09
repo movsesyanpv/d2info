@@ -389,6 +389,8 @@ class D2info:
                 'items': nightfalls
             })
 
+        # test_json = await self.get_bungie_json('test', 'http://localhost:8000/api/dailyrotations')
+
         self.data_cursor.execute('''DROP TABLE weeklyrotations''')
         self.data_cursor.execute('''CREATE TABLE "weeklyrotations" ("items"	TEXT)''')
         self.data_cursor.execute('''INSERT into weeklyrotations VALUES (?)''', (str(rotations),))
