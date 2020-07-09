@@ -20,6 +20,6 @@ function enableTooltips() {
         })
     })
 }
-$(document).on("afterEventsParsed", function() {
+window.onload = function() {
     enableTooltips()
-});
+};

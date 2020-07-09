@@ -133,8 +133,8 @@ class D2info:
                    '<meta name="theme-color" content="#222222">\n'
                    '<meta name="viewport" content="width=device-width, initial-scale=1">\n'
                    '<link rel="stylesheet" type="text/css" href="/static/style.css">\n'
-                   '<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.5.1/jquery.min.js" async></script>\n'
-                   '<script src="/static/d2info.js" async></script>\n'
+                   '<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.5.1/jquery.min.js" defer></script>\n'
+                   '<script src="/static/d2info.js" defer></script>\n'
                    '<meta charset="UTF8">\n'
                    '<meta name="description" content="Сезонный ассортимент Эверверс"/>\n'
                    '<meta property="og:description" content="Предметы, которые будут продаваться в этом сезоне у Тесс Эверис" />\n'
@@ -308,8 +308,7 @@ class D2info:
 
         page.write('</div>\n'
                    '</div>\n'
-                   '</div>\n'
-                   '<script>enableTooltips()</script>')
+                   '</div>\n')
 
         page.close()
 
