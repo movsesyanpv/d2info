@@ -309,7 +309,7 @@ class D2info:
         page.write('</div>\n'
                    '</div>\n'
                    '</div>\n'
-                   '<script>enableTooltips()</script>'
+                   # '<script>enableTooltips()</script>'
                    '{% endblock %}')
 
         page.close()
