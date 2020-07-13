@@ -3,9 +3,9 @@
 {% block head %}{% endblock %}
 
 {% block content %}
-<div class="global_grid">
+<div class="mod_grid">
     {% for global_item in global_items %}
-    <div class="global_item">
+    <div class="global_item {{ global_item['size'] }}">
         <h2>{{ global_item['name'] }}</h2>
         <div class="mod_wrapper">
             {% for item in global_item['items'] %}

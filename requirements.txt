@@ -7,3 +7,6 @@ jinja2
 sanic-jinja2
 sanic-session
 markdown2
+bs4
+python-dateutil
+matplotlib
