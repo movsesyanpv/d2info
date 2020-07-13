@@ -189,27 +189,13 @@ class D2data:
                 }
                 self.data[lang]['xur']['fields'].append(loc_field)
 
-    async def get_heroic_story(self, langs, forceget=False):
+    async def get_heroic_story(self, size='wide', langs=['ru'], forceget=False):
         activities_resp = await self.get_activities_response('heroicstory', string='heroic story missions',
                                                              force=forceget)
         if not activities_resp:
-            return
-        resp_time = activities_resp['timestamp']
+            return {}
         for lang in langs:
-            local_types = self.translations[lang]
-
-            self.data[lang]['heroicstory'] = {
-                'thumbnail': {
-                    'url': "https://www.bungie.net/common/destiny2_content/icons/DestinyActivityModeDefinition_"
-                           "5f8a923a0d0ac1e4289ae3be03f94aa2.png"
-                },
-                'fields': [],
-                'color': 10070709,
-                'type': 'rich',
-                'title': self.translations[lang]['msg']['heroicstory'],
-                'footer': {'text': self.translations[lang]['msg']['resp_time']},
-                'timestamp': resp_time
-            }
+            heroics = []
 
             activities_json = activities_resp
             for key in activities_json['Response']['activities']['data']['availableActivities']:
@@ -217,13 +203,17 @@ class D2data:
                 definition = 'DestinyActivityDefinition'
                 r_json = await self.destiny.decode_hash(item_hash, definition, language=lang)
 
-                if local_types['heroicstory'] in r_json['displayProperties']['name']:
+                if 'Ежедневная героическая сюжетная миссия: ' in r_json['displayProperties']['name']:
                     info = {
-                        'inline': True,
                         "name": r_json['selectionScreenDisplayProperties']['name'],
-                        "value": r_json['selectionScreenDisplayProperties']['description']
+                        "description": r_json['selectionScreenDisplayProperties']['description']
                     }
-                    self.data[lang]['heroicstory']['fields'].append(info)
+                    heroics.append(info)
+            return {
+                'name': 'Героические сюжетные миссии',
+                'size': size,
+                'items': heroics
+            }
 
     async def get_forge(self, size='', langs=['ru'], forceget=False):
         activities_resp = await self.get_activities_response('forge', force=forceget)
@@ -859,11 +849,12 @@ class D2data:
         rotations = [await self.get_spider(),
                      await self.get_strike_modifiers(),
                      await self.get_reckoning_modifiers(),
+                     await self.get_heroic_story(size='tall'),
                      await self.get_forge()]
 
         self.data_cursor.execute('''DROP TABLE dailyrotations''')
         self.data_cursor.execute('''CREATE TABLE "dailyrotations" ("items"	TEXT)''')
-        self.data_cursor.execute('''INSERT into dailyrotations VALUES (?)''', (str(rotations),))
+        self.data_cursor.execute('''INSERT into dailyrotations VALUES (?)''', (str(rotations).replace('\"', '\\\"').replace('\'', '"'),))
         self.data_db.commit()
 
     async def get_weekly_rotations(self):
@@ -899,11 +890,9 @@ class D2data:
                 'items': nightfalls
             })
 
-        # test_json = await self.get_bungie_json('test', 'http://localhost:8000/api/dailyrotations')
-
         self.data_cursor.execute('''DROP TABLE weeklyrotations''')
         self.data_cursor.execute('''CREATE TABLE "weeklyrotations" ("items"	TEXT)''')
-        self.data_cursor.execute('''INSERT into weeklyrotations VALUES (?)''', (str(rotations),))
+        self.data_cursor.execute('''INSERT into weeklyrotations VALUES (?)''', (str(rotations).replace('\"', '\\\"').replace('\'', '"'),))
         self.data_db.commit()
 
     async def decode_modifiers(self, key, lang):
