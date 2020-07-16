@@ -328,27 +328,13 @@ class D2data:
                 'items': r_info
                 }
 
-    async def get_nightfall820(self, langs, forceget=False):
-        activities_resp = await self.get_activities_response('nightfalls820', string='820 nightfalls', force=forceget)
-        if not activities_resp:
-            return
-        resp_time = activities_resp['timestamp']
-        for lang in langs:
-            local_types = self.translations[lang]
+    async def get_nightfall820(self, size='', langs=['ru'], forceget=False):
+        lang = 'ru'
 
-            self.data[lang]['nightfalls820'] = {
-                'thumbnail': {
-                    'url': ''
-                },
-                'fields': [],
-                'color': 7506394,
-                'type': 'rich',
-                'title': self.translations[lang]['msg']['nightfalls820'],
-                'footer': {'text': self.translations[lang]['msg']['resp_time']},
-                'timestamp': resp_time
-            }
-
+        activities_resp = await self.get_activities_response('nightfalls820', string='820 nightfalls')
+        if activities_resp:
             activities_json = activities_resp
+            nightfalls = []
             for key in activities_json['Response']['activities']['data']['availableActivities']:
                 item_hash = key['activityHash']
                 definition = 'DestinyActivityDefinition'
@@ -356,27 +342,31 @@ class D2data:
                 try:
                     recommended_light = key['recommendedLight']
                     if recommended_light == 820:
-                        self.data[lang]['nightfalls820']['thumbnail']['url'] = self.icon_prefix + \
-                                                                               r_json['displayProperties']['icon']
                         if r_json['matchmaking']['requiresGuardianOath']:
                             info = {
-                                'inline': True,
-                                'name': self.translations[lang]['msg']['guidedgamenightfall'],
-                                'value': r_json['selectionScreenDisplayProperties']['name']
+                                'name': 'Сумрак с гидом',
+                                'description': r_json['selectionScreenDisplayProperties']['name']
                             }
                         else:
                             info = {
-                                'inline': True,
                                 'name': r_json['selectionScreenDisplayProperties']['name'],
-                                'value': r_json['selectionScreenDisplayProperties']['description']
+                                'description': r_json['selectionScreenDisplayProperties']['description']
                             }
-                        self.data[lang]['nightfalls820']['fields'].append(info)
+                        nightfalls.append(info)
                 except KeyError:
                     pass
+            return {
+                'name': 'Сумрачные налеты',
+                'size': size,
+                'items': nightfalls
+            }
+        else:
+            return {}
 
     async def get_modifiers(self, lang, act_hash):
         url = 'https://www.bungie.net/{}/Explore/Detail/DestinyActivityDefinition/{}'.format(lang, act_hash)
-        r = await self.session.get(url)
+        session = aiohttp.ClientSession()
+        r = await session.get(url)
         r = await r.text()
         soup = BeautifulSoup(r, features="html.parser")
         modifier_list = soup.find_all('div', {'data-identifier': 'modifier-information'})
@@ -391,29 +381,18 @@ class D2data:
             }
             modifiers.append(mod)
         if r:
+            await session.close()
             return modifiers
         else:
+            await session.close()
             return False
 
-    async def get_raids(self, langs, forceget=False):
+    async def get_raids(self, size='wide tall', langs=['ru'], forceget=False):
         activities_resp = await self.get_activities_response('raids', force=forceget)
         if not activities_resp:
-            return
-        resp_time = activities_resp['timestamp']
+            return {}
+        raids = []
         for lang in langs:
-            local_types = self.translations[lang]
-
-            self.data[lang]['raids'] = {
-                'thumbnail': {
-                    'url': 'https://www.bungie.net/common/destiny2_content/icons/8b1bfd1c1ce1cab51d23c78235a6e067.png'
-                },
-                'fields': [],
-                'color': 0xF1C40F,
-                'type': 'rich',
-                'title': self.translations[lang]['msg']['raids'],
-                'footer': {'text': self.translations[lang]['msg']['resp_time']},
-                'timestamp': resp_time
-            }
 
             first_reset_time = 1580230800
             seconds_since_first = time.time() - first_reset_time
@@ -422,18 +401,32 @@ class D2data:
             last_wish_challenges = [1250327262, 3871581136, 1568895666, 4007940282, 2836954349]
             sotp_challenges = [1348944144, 3415614992, 1381881897]
             cos_challenges = [2459033425, 2459033426, 2459033427]
+            levi_order = {
+                "417231112": "1. Сады удовольствий<br>\n2. Турнир<br>\n3. Королевские бассейны<br>\n4. Трон",
+                "757116822": "1. Турнир<br>\n2. Королевские бассейны<br>\n3. Сады удовольствий<br>\n4. Трон",
+                "1685065161": "1. Турнир<br>\n2. Сады удовольствий<br>\n3. Королевские бассейны<br>\n4. Трон",
+                "2449714930": "1. Королевские бассейны<br>\n2. Турнир<br>\n3. Сады удовольствий<br>\n4. Трон",
+                "3446541099": "1. Сады удовольствий<br>\n2. Королевские бассейны<br>\n3. Турнир<br>\n4. Трон",
+                "3879860661": "1. Королевские бассейны<br>\n2. Сады удовольствий<br>\n3. Турнир<br>\n4. Трон"
+            }
+            eow_loadouts = [
+                "Кинетическое: Револьвер", "Энергетическое: Снайперская винтовка", "Силовое: Любое",
+                "Кинетическое: Автомат", "Энергетическое: Автомат", "Силовое: Любое",
+                "Кинетическое: Пистолет", "Энергетическое: Винтовка разведчика", "Силовое: Меч",
+                "Кинетическое: Пистолет-пулемет", "Энергетическое: Любое", "Силовое: Гранатомет",
+                "Кинетическое: Любое", "Энергетическое: Плазменная винтовка", "Силовое: Плазменная винтовка",
+                "Кинетическое: Дробовик", "Энергетическое: Автомат", "Силовое: Ракетная установка"
+            ]
             lw_ch = 0
             sotp_ch = 0
             cos_ch = 0
 
             hawthorne_url = 'https://www.bungie.net/platform/Destiny2/{}/Profile/{}/Character/{}/Vendors/3347378076/'. \
                 format(self.char_info['platform'], self.char_info['membershipid'], self.char_info['charid'][0])
-            hawthorne_resp = await self.get_cached_json('hawthorne', 'hawthorne', hawthorne_url, self.vendor_params,
-                                                        force=forceget)
+            hawthorne_resp = await self.get_bungie_json('hawthorne', hawthorne_url, self.vendor_params)
             if not hawthorne_resp:
                 return
             hawthorne_json = hawthorne_resp
-            resp_time = hawthorne_json['timestamp']
             for cat in hawthorne_json['Response']['sales']['data']:
                 if hawthorne_json['Response']['sales']['data'][cat]['itemHash'] in last_wish_challenges:
                     lw_ch = hawthorne_json['Response']['sales']['data'][cat]['itemHash']
@@ -448,121 +441,99 @@ class D2data:
                 definition = 'DestinyActivityDefinition'
                 r_json = await self.destiny.decode_hash(item_hash, definition, language=lang)
                 i = 1
-                if str(r_json['hash']) in self.translations[lang]['levi_order'] and \
+                if str(r_json['hash']) in levi_order.keys() and \
                         not r_json['matchmaking']['requiresGuardianOath']:
                     challenges = await self.get_modifiers(lang, item_hash)
                     if challenges:
                         challenge = set(challenges[0]['name'].lower().replace('"', '').split(' '))
                         challenge.discard('the')
-                        order_strings = self.translations[lang]['levi_order'][str(r_json['hash'])].splitlines()
+                        order_strings = levi_order[str(r_json['hash'])].splitlines()
                         levi_str = ''
                         for string in order_strings:
                             intersection = challenge.intersection(set(string.lower().split(' ')))
                             if intersection:
-                                levi_str = '{}**{}**\n'.format(levi_str, string)
+                                levi_str = '{}<b>{}</b>\n'.format(levi_str, string)
                             else:
                                 levi_str = '{}{}\n'.format(levi_str, string)
                         levi_str = levi_str[:-1]
                     else:
-                        levi_str = self.translations[lang]['levi_order'][str(r_json['hash'])]
+                        levi_str = levi_order[str(r_json['hash'])]
                     info = {
-                        'inline': True,
                         'name': r_json['originalDisplayProperties']['name'],
-                        'value': levi_str
+                        'description': levi_str
                     }
-                    self.data[lang]['raids']['fields'].append(info)
-                if self.translations[lang]["EoW"] in r_json['displayProperties']['name'] and \
+                    raids.append(info)
+                if 'пожиратель миров: Престиж' in r_json['displayProperties']['name'] and \
                         not r_json['matchmaking']['requiresGuardianOath']:
                     info = {
                         'inline': False,
-                        'name': self.translations[lang]['lairs'],
-                        'value': u"\u2063"
+                        'name': 'Пожиратель Миров и Звездный Шпиль',
+                        'description': u"\u2063"
                     }
                     mods = await self.get_modifiers(lang, r_json['hash'])
                     resp_time = datetime.utcnow().isoformat()
                     if mods:
-                        loadout = '{}\n{}\n{}'.format(self.translations[lang]['armsmaster'][eow_loadout*3],
-                                                      self.translations[lang]['armsmaster'][eow_loadout*3+1],
-                                                      self.translations[lang]['armsmaster'][eow_loadout*3+2])
-                        info['value'] = '{}: {}\n\n{}:\n{}'.format(mods[0]['name'], mods[0]['description'],
+                        loadout = '{}<br>\n{}\n<br>{}'.format(eow_loadouts[eow_loadout*3], eow_loadouts[eow_loadout*3+1],
+                                                      eow_loadouts[eow_loadout*3+2])
+                        info['description'] = '{}: {}\n<br>\n{}:\n<br>{}'.format(mods[0]['name'], mods[0]['description'],
                                                                    mods[1]['name'], loadout)
-                    else:
-                        info['value'] = self.data[lang]['api_is_down']['fields'][0]['name']
-                    self.data[lang]['raids']['fields'].append(info)
-                if self.translations[lang]['LW'] in r_json['displayProperties']['name'] and \
+                    raids.append(info)
+                if 'Последнее желание' in r_json['displayProperties']['name'] and \
                         not r_json['matchmaking']['requiresGuardianOath'] and lw_ch != 0:
                     info = {
-                        'inline': True,
                         'name': r_json['originalDisplayProperties']['name'],
-                        'value': u"\u2063"
+                        'description': u"\u2063"
                     }
                     curr_challenge = lw_ch
                     curr_challenge = await self.destiny.decode_hash(curr_challenge, 'DestinyInventoryItemDefinition',
                                                                     language=lang)
-                    info['value'] = curr_challenge['displayProperties']['name']
-                    self.data[lang]['raids']['fields'].append(info)
-                if self.translations[lang]['SotP'] in r_json['displayProperties']['name'] and \
+                    info['description'] = curr_challenge['displayProperties']['name']
+                    raids.append(info)
+                if 'Истребители прошлого' in r_json['displayProperties']['name'] and \
                         not r_json['matchmaking']['requiresGuardianOath'] and sotp_ch != 0:
                     info = {
-                        'inline': True,
                         'name': r_json['originalDisplayProperties']['name'],
-                        'value': u"\u2063"
+                        'description': u"\u2063"
                     }
                     curr_challenge = sotp_ch
                     curr_challenge = await self.destiny.decode_hash(curr_challenge, 'DestinyInventoryItemDefinition',
                                                                     language=lang)
-                    info['value'] = curr_challenge['displayProperties']['name']
-                    self.data[lang]['raids']['fields'].append(info)
-                if self.translations[lang]['CoS'] in r_json['displayProperties']['name'] and \
+                    info['description'] = curr_challenge['displayProperties']['name']
+                    raids.append(info)
+                if 'Корона скорби' in r_json['displayProperties']['name'] and \
                         not r_json['matchmaking']['requiresGuardianOath'] and cos_ch != 0:
                     info = {
-                        'inline': True,
                         'name': r_json['originalDisplayProperties']['name'],
-                        'value': u"\u2063"
+                        'descripition': u"\u2063"
                     }
                     curr_challenge = cos_ch
                     curr_challenge = await self.destiny.decode_hash(curr_challenge, 'DestinyInventoryItemDefinition',
                                                                     language=lang)
-                    info['value'] = curr_challenge['displayProperties']['name']
-                    self.data[lang]['raids']['fields'].append(info)
-                if self.translations[lang]['GoS'] in r_json['displayProperties']['name'] and \
+                    info['description'] = curr_challenge['displayProperties']['name']
+                    raids.append(info)
+                if 'Сад спасения' in r_json['displayProperties']['name'] and \
                         not r_json['matchmaking']['requiresGuardianOath']:
                     info = {
-                        'inline': True,
                         'name': r_json['originalDisplayProperties']['name'],
-                        'value': u"\u2063"
+                        'description': u"\u2063"
                     }
                     mods = await self.get_modifiers(lang, r_json['hash'])
-                    resp_time = datetime.utcnow().isoformat()
                     if mods:
-                        info['value'] = mods[0]['name']
-                    else:
-                        info['value'] = self.data[lang]['api_is_down']['fields'][0]['name']
-                    self.data[lang]['raids']['fields'].append(info)
-            self.data[lang]['raids']['timestamp'] = resp_time
+                        info['description'] = mods[0]['name']
+                    raids.append(info)
+        return {
+            'name': 'Рейды',
+            'size': size,
+            'items': raids
+        }
 
-    async def get_ordeal(self, langs, forceget=False):
+    async def get_ordeal(self, size='', langs=['ru'], forceget=False):
         activities_resp = await self.get_activities_response('ordeal', force=forceget)
         if not activities_resp:
-            return
-        resp_time = activities_resp['timestamp']
+            return {}
         for lang in langs:
-            local_types = self.translations[lang]
-
-            self.data[lang]['ordeal'] = {
-                'thumbnail': {
-                    'url': 'https://www.bungie.net/common/destiny2_content/icons/DestinyMilestoneDefinition'
-                           '_a72e5ce5c66e21f34a420271a30d7ec3.png'
-                },
-                'fields': [],
-                'color': 5331575,
-                'type': 'rich',
-                'title': self.translations[lang]['msg']['ordeal'],
-                'footer': {'text': self.translations[lang]['msg']['resp_time']},
-                'timestamp': resp_time
-            }
-
             strikes = []
+            ordeal = []
 
             activities_json = activities_resp
             for key in activities_json['Response']['activities']['data']['availableActivities']:
@@ -572,77 +543,56 @@ class D2data:
                 if r_json['activityTypeHash'] == 4110605575:
                     strikes.append({"name": r_json['displayProperties']['name'],
                                     "description": r_json['displayProperties']['description']})
-                if local_types['ordeal'] in r_json['displayProperties']['name'] and \
-                        local_types['adept'] in r_json['displayProperties']['name']:
+                if 'Сумрачный налет: Побоище' in r_json['displayProperties']['name'] and \
+                        ': Мастер' in r_json['displayProperties']['name']:
                     info = {
-                        'inline': True,
                         'name': r_json['originalDisplayProperties']['description'],
-                        'value': u"\u2063"
+                        'description': u"\u2063"
                     }
-                    self.data[lang]['ordeal']['fields'].append(info)
+                    ordeal.append(info)
 
-            if len(self.data[lang]['ordeal']['fields']) > 0:
+            if info:
                 for strike in strikes:
-                    if strike['name'] in self.data[lang]['ordeal']['fields'][0]['name']:
-                        self.data[lang]['ordeal']['fields'][0]['value'] = strike['description']
+                    if strike['name'] in info['name']:
+                        info['description'] = strike['description']
                         break
-
-    async def get_nightmares(self, langs, forceget=False):
-        activities_resp = await self.get_activities_response('nightmares', force=forceget)
-        if not activities_resp:
-            return
-        resp_time = activities_resp['timestamp']
-        for lang in langs:
-            local_types = self.translations[lang]
-
-            self.data[lang]['nightmares'] = {
-                'thumbnail': {
-                    'url': 'https://www.bungie.net/common/destiny2_content/icons/DestinyActivityModeDefinition_'
-                           '48ad57129cd0c46a355ef8bcaa1acd04.png'
-                },
-                'fields': [],
-                'color': 6037023,
-                'type': 'rich',
-                'title': self.translations[lang]['msg']['nightmares'],
-                'footer': {'text': self.translations[lang]['msg']['resp_time']},
-                'timestamp': resp_time
+            return {
+                'name': 'Сумрачный налет: Побоище',
+                'size': size,
+                'items': ordeal
             }
 
+    async def get_nightmares(self, size='', langs=['ru'], forceget=False):
+        activities_resp = await self.get_activities_response('nightmares', force=forceget)
+        if not activities_resp:
+            return {}
+        for lang in langs:
+            nightmares = []
             activities_json = activities_resp
             for key in activities_json['Response']['activities']['data']['availableActivities']:
                 item_hash = key['activityHash']
                 definition = 'DestinyActivityDefinition'
                 r_json = await self.destiny.decode_hash(item_hash, definition, language=lang)
-                if local_types['nightmare'] in r_json['displayProperties']['name'] and \
-                        local_types['adept'] in r_json['displayProperties']['name']:
+                if 'Охота на кошмаров:' in r_json['displayProperties']['name'] and \
+                        ': Мастер' in r_json['displayProperties']['name']:
                     info = {
-                        'inline': True,
-                        'name': r_json['displayProperties']['name'].replace(local_types['adept'], ""),
-                        'value': r_json['displayProperties']['description']
+                        'name': r_json['displayProperties']['name'].replace(': Мастер', "").replace('Охота на кошмаров: ', '').replace('\"', ''),
+                        'description': r_json['displayProperties']['description']
                     }
-                    self.data[lang]['nightmares']['fields'].append(info)
+                    nightmares.append(info)
+            return {
+                'name': 'Охоты на кошмаров',
+                'size': size,
+                'items': nightmares
+            }
 
-    async def get_crucible_rotators(self, langs, forceget=False):
+    async def get_crucible_rotators(self, size='wide', langs=['ru'], forceget=False):
         activities_resp = await self.get_activities_response('cruciblerotators', string='crucible rotators',
                                                              force=forceget)
         if not activities_resp:
-            return
-        resp_time = activities_resp['timestamp']
+            return {}
+        rotators = []
         for lang in langs:
-            local_types = self.translations[lang]
-
-            self.data[lang]['cruciblerotators'] = {
-                'thumbnail': {
-                    'url': self.icon_prefix + '/common/destiny2_content/icons/cc8e6eea2300a1e27832d52e9453a227.png'
-                },
-                'fields': [],
-                'color': 6629649,
-                'type': 'rich',
-                'title': self.translations[lang]['msg']['cruciblerotators'],
-                'footer': {'text': self.translations[lang]['msg']['resp_time']},
-                'timestamp': resp_time
-            }
-
             activities_json = activities_resp
             for key in activities_json['Response']['activities']['data']['availableActivities']:
                 item_hash = key['activityHash']
@@ -653,23 +603,22 @@ class D2data:
                         obj_def = 'DestinyObjectiveDefinition'
                         objective = await self.destiny.decode_hash(r_json['challenges'][0]['objectiveHash'], obj_def,
                                                                    lang)
-                        if self.translations[lang]['rotator'] in objective['displayProperties']['name'] or r_json['challenges'][0]['objectiveHash'] == 1607758693:
-                            if not self.data[lang]['cruciblerotators']['thumbnail']['url']:
-                                if 'icon' in r_json['displayProperties']:
-                                    self.data[lang]['cruciblerotators']['thumbnail']['url'] = self.icon_prefix + \
-                                                                                              r_json[
-                                                                                                  'displayProperties'][
-                                                                                                  'icon']
-                                else:
-                                    self.data[lang]['cruciblerotators']['thumbnail']['url'] = self.icon_prefix + \
-                                                                                              '/common/destiny2_content/icons/' \
-                                                                                              'cc8e6eea2300a1e27832d52e9453a227.png'
+                        if 'Испытание из сменяемого плейлиста Горнила' in objective['displayProperties']['name'] or r_json['challenges'][0]['objectiveHash'] == 1607758693:
                             info = {
-                                'inline': True,
+                                'icon': r_json['displayProperties']['icon'],
                                 "name": r_json['displayProperties']['name'],
-                                "value": r_json['displayProperties']['description']
+                                "description": r_json['displayProperties']['description']
                             }
-                            self.data[lang]['cruciblerotators']['fields'].append(info)
+                            if 'icon' in r_json['displayProperties']:
+                                info['icon'] = r_json['displayProperties']['icon']
+                            else:
+                                info['icon'] = '/common/destiny2_content/icons/cc8e6eea2300a1e27832d52e9453a227.png'
+                            rotators.append(info)
+        return {
+            'name': 'Сменяемые режимы горнила',
+            'size': size,
+            'items': rotators
+        }
 
     async def get_seasonal_eververse(self):
         tess_def = await self.destiny.decode_hash(3361454721, 'DestinyVendorDefinition')
@@ -759,37 +708,11 @@ class D2data:
         self.data_db.commit()
 
     async def get_weekly_rotations(self):
-        rotations = []
-        lang = 'ru'
-
-        activities_resp = await self.get_activities_response('nightfalls820', string='820 nightfalls')
-        if activities_resp:
-            activities_json = activities_resp
-            nightfalls = []
-            for key in activities_json['Response']['activities']['data']['availableActivities']:
-                item_hash = key['activityHash']
-                definition = 'DestinyActivityDefinition'
-                r_json = await self.destiny.decode_hash(item_hash, definition, language=lang)
-                try:
-                    recommended_light = key['recommendedLight']
-                    if recommended_light == 820:
-                        if r_json['matchmaking']['requiresGuardianOath']:
-                            info = {
-                                'name': 'Сумрак с гидом',
-                                'description': r_json['selectionScreenDisplayProperties']['name']
-                            }
-                        else:
-                            info = {
-                                'name': r_json['selectionScreenDisplayProperties']['name'],
-                                'description': r_json['selectionScreenDisplayProperties']['description']
-                            }
-                        nightfalls.append(info)
-                except KeyError:
-                    pass
-            rotations.append({
-                'name': 'Сумрачные налеты',
-                'items': nightfalls
-            })
+        rotations = [await self.get_nightfall820(),
+                     await self.get_raids(),
+                     await self.get_nightmares(),
+                     await self.get_crucible_rotators(),
+                     await self.get_ordeal()]
 
         n_rotations = []
         for rotation in rotations:
