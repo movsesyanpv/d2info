@@ -636,6 +636,10 @@ class D2data:
                 'items': []
             },
             {
+                'name': 'Яркие энграммы',
+                'items': []
+            },
+            {
                 'name': 'Популярные предметы за серебро',
                 'items': []
             }]
@@ -669,7 +673,7 @@ class D2data:
             elif item['displayCategoryIndex'] == 3 and item['itemHash'] != 827183327:
                 is_interesting = True
                 cat_number = 9
-                data_index = 3
+                data_index = 4
             if is_interesting:
                 currency_resp = await self.destiny.decode_hash(item['currencies'][0]['itemHash'], definition,
                                                                language=lang)
@@ -684,6 +688,26 @@ class D2data:
                     'cost': item['currencies'][0]['quantity']
                 })
                 n_order += 1
+        engram_def = await self.destiny.decode_hash(tess_def['itemList'][-1]['itemHash'], 'DestinyInventoryItemDefinition', 'ru')
+        for category in engram_def['preview']['derivedItemCategories'][0]['items']:
+            cat_def = await self.destiny.decode_hash(category['itemHash'], 'DestinyInventoryItemDefinition', 'ru')
+            for cat_preview in cat_def['preview']['derivedItemCategories']:
+                for engram_item in cat_preview['items']:
+                    item_def = await self.destiny.decode_hash(engram_item['itemHash'], definition, language=lang)
+                    if 'screenshot' in item_def.keys():
+                        screenshot = '<img alt="Screenshot" class="screenshot_hover" src="https://bungie.net{}">'.format(
+                            item_def['screenshot'])
+                    else:
+                        screenshot = ''
+                    data[3]['items'].append({
+                        'id': '{}_{}_{}'.format(engram_item['itemHash'], 1337, n_order),
+                        'icon': item_def['displayProperties']['icon'],
+                        'tooltip_id': '{}_{}_{}_tooltip'.format(engram_item['itemHash'], 1337, n_order),
+                        'hash': engram_item['itemHash'],
+                        'name': item_def['displayProperties']['name'],
+                        'screenshot': screenshot
+                    })
+                    n_order += 1
         self.data_cursor.execute('''DROP TABLE season_ev''')
         self.data_cursor.execute('''CREATE TABLE "season_ev" ("items"	TEXT)''')
         self.data_cursor.execute('''INSERT into season_ev VALUES (?)''',

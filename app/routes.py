@@ -30,6 +30,12 @@ async def eververse(request):
     return jinja.render('ev.html', request, global_items=items)
 
 
+@app.route('/evweekly')
+@jinja.template('ev_weekly.html')
+async def ev_weekly(request):
+    return {}
+
+
 @app.route('/daily')
 @jinja.template('daily.html')
 async def daily(request):
