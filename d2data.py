@@ -713,7 +713,7 @@ class D2data:
                 cat_number = 9
                 data_index = 1
             elif item['displayCategoryIndex'] == 10 and item['itemHash'] not in [353932628, 3260482534, 3536420626,
-                                                                                3187955025, 2638689062]:
+                                                                                 3187955025, 2638689062]:
                 is_interesting = True
                 cat_number = 10
                 data_index = 2

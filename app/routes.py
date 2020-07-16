@@ -97,6 +97,19 @@ async def dailyrotations(request):
     return response.json({'Response': json.dumps(items, ensure_ascii=False)})
 
 
+@app.route('/api/seasonev')
+async def seasonev(request):
+    data_db = sqlite3.connect('data.db')
+    data_cursor = data_db.cursor()
+    data_cursor.execute('''SELECT items FROM season_ev''')
+    items = data_cursor.fetchone()
+    if items is not None:
+        items = eval(items[0])
+    else:
+        items = []
+    return response.json({'Response': json.dumps(items, ensure_ascii=False)})
+
+
 @app.route('/item')
 async def item(request):
     api_data_file = open('api.json', 'r')
