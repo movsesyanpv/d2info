@@ -68,6 +68,10 @@ class D2data:
             self.data_cursor.execute('''CREATE TABLE "weeklyrotations" ("items"	TEXT)''')
         except sqlite3.OperationalError:
             pass
+        try:
+            self.data_cursor.execute('''CREATE TABLE "season_ev" ("items"	TEXT)''')
+        except sqlite3.OperationalError:
+            pass
         self.data_db.commit()
 
     async def get_spider(self, size='tall', langs=['ru'], forceget=False):
@@ -670,180 +674,72 @@ class D2data:
     async def get_seasonal_eververse(self):
         tess_def = await self.destiny.decode_hash(3361454721, 'DestinyVendorDefinition')
 
-        page = codecs.open('app/templates/ev.html', 'w', encoding='UTF8')
-        page.write('{% extends \'base.html\' %}'
-                   '{% block title %}Сезонный Эверверс{% endblock %}\n'
-                   '{% block scripts %}'
-                   '<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.5.1/jquery.min.js" defer></script>\n'
-                   '<script src="/static/d2info.js" defer></script>\n'
-                   '{% endblock %}'
-                   '{% block meta %}'
-                   '<meta name="description" content="Сезонный ассортимент Эверверс"/>\n'
-                   '<meta property="og:description" content="Предметы, которые будут продаваться в этом сезоне у Тесс Эверис" />\n'
-                   '<meta property="og:title" content="Сезонный Эверверс" />\n'
-                   '<meta property="og:type" content="website" />\n'
-                   '<meta property="og:url" content="https://d2info.happyv0dka.cloud/eververse" />\n'
-                   '<meta property="og:image" content="https://bungie.net//common/destiny2_content/icons/30c6cc828d7753bcca72748ba2aa83d6.png" />\n'
-                   '<link rel="icon" type="image/png" sizes="32x32" href="https://bungie.net//common/destiny2_content/icons/30c6cc828d7753bcca72748ba2aa83d6.png">\n'
-                   '{% endblock %}')
+        data = [{
+            'name': 'Популярные предметы за яркую пыль',
+            'items': []
+            },
+            {
+                'name': 'Предметы за яркую пыль',
+                'items': []
+            },
+            {
+                'name': 'Потребляемые предметы за яркую пыль',
+                'items': []
+            },
+            {
+                'name': 'Популярные предметы за серебро',
+                'items': []
+            }]
 
         lang = 'ru'
-        page.write('{{% block content %}}'
-                   '<div class="global_grid">\n'
-                   '<div class="global_item">\n'
-                   '<h2>{}</h2>\n'
-                   '<div class="wrapper">\n'.format('Популярные предметы за яркую пыль'))
         n_order = 0
         for i, item in enumerate(tess_def['itemList']):
+            definition = 'DestinyInventoryItemDefinition'
+            item_def = await self.destiny.decode_hash(item['itemHash'], definition, language=lang)
+            if 'screenshot' in item_def.keys():
+                screenshot = '<img alt="Screenshot" class="screenshot_hover" src="https://bungie.net{}">'.format(
+                    item_def['screenshot'])
+            else:
+                screenshot = ''
+            is_interesting = False
             if item['displayCategoryIndex'] == 4 and item['itemHash'] not in [353932628, 3260482534, 3536420626,
                                                                               3187955025, 2638689062]:
-                definition = 'DestinyInventoryItemDefinition'
-                item_def = await self.destiny.decode_hash(item['itemHash'], definition, language=lang)
-                if 'screenshot' in item_def.keys():
-                    screenshot = '<img alt="Screenshot" class="screenshot_hover" src="https://bungie.net{}">'.format(
-                        item_def['screenshot'])
-                else:
-                    screenshot = ''
+                is_interesting = True
+                cat_number = 4
+                data_index = 0
+            elif item['displayCategoryIndex'] == 9 and item['itemHash'] not in [353932628, 3260482534, 3536420626,
+                                                                                3187955025, 2638689062]:
+                is_interesting = True
+                cat_number = 9
+                data_index = 1
+            elif item['displayCategoryIndex'] == 10 and item['itemHash'] not in [353932628, 3260482534, 3536420626,
+                                                                                3187955025, 2638689062]:
+                is_interesting = True
+                cat_number = 10
+                data_index = 2
+            elif item['displayCategoryIndex'] == 3 and item['itemHash'] != 827183327:
+                is_interesting = True
+                cat_number = 9
+                data_index = 3
+            if is_interesting:
                 currency_resp = await self.destiny.decode_hash(item['currencies'][0]['itemHash'], definition,
                                                                language=lang)
-                page.write('    <div class="item" id="{}_4_{}">\n'
-                           '                <img alt="Item icon" class="icon" src="https://bungie.net{}">\n'
-                           '            <div class="tooltip" id="{}_4_{}_tooltip" style="left: auto">\n'
-                           '                <a class="name" href="/item/?hash={}"><b>{}</b></a><br>\n'
-                           '                    {}\n'
-                           '                    <img alt="Currency icon" class="currency" src="https://bungie.net{}">\n'
-                           '                    <a>{}</a>\n'
-                           '            </div>\n'
-                           '    </div>\n'.format(item['itemHash'],
-                                                 n_order,
-                                                 item_def['displayProperties']['icon'],
-                                                 item['itemHash'],
-                                                 n_order,
-                                                 item['itemHash'],
-                                                 item_def['displayProperties']['name'],
-                                                 screenshot,
-                                                 currency_resp['displayProperties']['icon'],
-                                                 item['currencies'][0]['quantity']))
+                data[data_index]['items'].append({
+                    'id': '{}_{}_{}'.format(item['itemHash'], cat_number, n_order),
+                    'icon': item_def['displayProperties']['icon'],
+                    'tooltip_id': '{}_{}_{}_tooltip'.format(item['itemHash'], cat_number, n_order),
+                    'hash': item['itemHash'],
+                    'name': item_def['displayProperties']['name'],
+                    'screenshot': screenshot,
+                    'currency_icon': currency_resp['displayProperties']['icon'],
+                    'cost': item['currencies'][0]['quantity']
+                })
                 n_order += 1
-        page.write('</div>\n'
-                   '</div>\n')
-
-        page.write('<div class="global_item">\n'
-                   '<h2>{}</h2>\n'
-                   '<div class="wrapper">\n'.format('Предметы за яркую пыль'))
-        for i, item in enumerate(tess_def['itemList']):
-            if item['displayCategoryIndex'] == 9 and item['itemHash'] not in [353932628, 3260482534, 3536420626,
-                                                                              3187955025, 2638689062]:
-                definition = 'DestinyInventoryItemDefinition'
-                item_def = await self.destiny.decode_hash(item['itemHash'], definition, language=lang)
-                if 'screenshot' in item_def.keys():
-                    screenshot = '<img alt="Screenshot" class="screenshot_hover" src="https://bungie.net{}">'.format(
-                        item_def['screenshot'])
-                else:
-                    screenshot = ''
-                currency_resp = await self.destiny.decode_hash(item['currencies'][0]['itemHash'], definition,
-                                                               language=lang)
-                page.write('    <div class="item" id="{}_9_{}">\n'
-                           '                <img alt="Item icon" class="icon" src="https://bungie.net{}">\n'
-                           '            <div class="tooltip" id="{}_9_{}_tooltip" style="left: auto">\n'
-                           '                <a class="name" href="/item/?hash={}"><b>{}</b></a><br>\n'
-                           '                    {}\n'
-                           '                    <img alt="Currency icon" class="currency" src="https://bungie.net{}">\n'
-                           '                    <a>{}</a>\n'
-                           '            </div>\n'
-                           '    </div>\n'.format(item['itemHash'],
-                                                 n_order,
-                                                 item_def['displayProperties']['icon'],
-                                                 item['itemHash'],
-                                                 n_order,
-                                                 item['itemHash'],
-                                                 item_def['displayProperties']['name'],
-                                                 screenshot,
-                                                 currency_resp['displayProperties']['icon'],
-                                                 item['currencies'][0]['quantity']))
-                n_order += 1
-
-        page.write('</div>\n'
-                   '</div>\n')
-
-        page.write('<div class="global_item">\n'
-                   '<h2>{}</h2>\n'
-                   '<div class="wrapper">\n'.format('Потребляемые предметы за яркую пыль'))
-        for i, item in enumerate(tess_def['itemList']):
-            if item['displayCategoryIndex'] == 10 and item['itemHash'] not in [353932628, 3260482534, 3536420626,
-                                                                               3187955025, 2638689062]:
-                definition = 'DestinyInventoryItemDefinition'
-                item_def = await self.destiny.decode_hash(item['itemHash'], definition, language=lang)
-                if 'screenshot' in item_def.keys():
-                    screenshot = '<img alt="Screenshot" class="screenshot_hover" src="https://bungie.net{}">'.format(
-                        item_def['screenshot'])
-                else:
-                    screenshot = ''
-                currency_resp = await self.destiny.decode_hash(item['currencies'][0]['itemHash'], definition,
-                                                               language=lang)
-                page.write('    <div class="item" id="{}_10_{}">\n'
-                           '                <img alt="Item icon" class="icon" src="https://bungie.net{}">\n'
-                           '            <div class="tooltip" id="{}_10_{}_tooltip" style="left: auto">\n'
-                           '                <a class="name" href="/item/?hash={}"><b>{}</b></a><br>\n'
-                           '                    {}\n'
-                           '                    <img alt="Currency icon" class="currency" src="https://bungie.net{}">\n'
-                           '                    <a>{}</a>\n'
-                           '            </div>\n'
-                           '    </div>\n'.format(item['itemHash'],
-                                                 n_order,
-                                                 item_def['displayProperties']['icon'],
-                                                 item['itemHash'],
-                                                 n_order,
-                                                 item['itemHash'],
-                                                 item_def['displayProperties']['name'],
-                                                 screenshot,
-                                                 currency_resp['displayProperties']['icon'],
-                                                 item['currencies'][0]['quantity']))
-                n_order += 1
-
-        page.write('</div>\n'
-                   '</div>\n')
-
-        page.write('<div class="global_item">\n'
-                   '<h2>{}</h2>\n'
-                   '<div class="wrapper">\n'.format('Популярные предметы за серебро'))
-        for i, item in enumerate(tess_def['itemList']):
-            if item['displayCategoryIndex'] == 3 and item['itemHash'] != 827183327:
-                definition = 'DestinyInventoryItemDefinition'
-                item_def = await self.destiny.decode_hash(item['itemHash'], definition, language=lang)
-                if 'screenshot' in item_def.keys():
-                    screenshot = '<img alt="Screenshot" class="screenshot_hover" src="https://bungie.net{}">'.format(
-                        item_def['screenshot'])
-                else:
-                    screenshot = ''
-                currency_resp = await self.destiny.decode_hash(item['currencies'][0]['itemHash'], definition,
-                                                               language=lang)
-                page.write('    <div class="item" id="{}_3_{}">\n'
-                           '                <img alt="Item icon" class="icon" src="https://bungie.net{}">\n'
-                           '            <div class="tooltip" id="{}_3_{}_tooltip" style="left: auto">\n'
-                           '                <a class="name" href="/item/?hash={}"><b>{}</b></a><br>\n'
-                           '                    {}\n'
-                           '                    <img alt="Currency icon" class="currency" src="https://bungie.net{}">\n'
-                           '                    <a>{}</a>\n'
-                           '            </div>\n'
-                           '    </div>\n'.format(item['itemHash'],
-                                                 n_order,
-                                                 item_def['displayProperties']['icon'],
-                                                 item['itemHash'],
-                                                 n_order,
-                                                 item['itemHash'],
-                                                 item_def['displayProperties']['name'],
-                                                 screenshot,
-                                                 currency_resp['displayProperties']['icon'],
-                                                 item['currencies'][0]['quantity']))
-                n_order += 1
-
-        page.write('</div>\n'
-                   '</div>\n'
-                   '</div>\n'
-                   '{% endblock %}')
-
-        page.close()
+        self.data_cursor.execute('''DROP TABLE season_ev''')
+        self.data_cursor.execute('''CREATE TABLE "season_ev" ("items"	TEXT)''')
+        self.data_cursor.execute('''INSERT into season_ev VALUES (?)''',
+                                 (str(data).replace('\"', '\\\"').replace('\'', '"'),))
+        self.data_db.commit()
 
     async def get_daily_rotations(self):
         rotations = [await self.get_spider(),

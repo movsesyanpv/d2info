@@ -15,7 +15,18 @@ async def index(request):
 @app.route('/eververse')
 @jinja.template('ev.html')
 async def eververse(request):
-    return {}
+    data_db = sqlite3.connect('data.db')
+    data_cursor = data_db.cursor()
+    data_cursor.execute('''SELECT items FROM season_ev''')
+    items = data_cursor.fetchone()
+    if items is not None:
+        items = eval(items[0])
+    else:
+        items = {
+            'name': 'Нет данных. Проверьте позднее.',
+            'items': []
+        }
+    return jinja.render('ev.html', request, global_items=items)
 
 
 @app.route('/daily')
