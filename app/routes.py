@@ -26,6 +26,7 @@ async def eververse(request):
             'name': 'Нет данных. Проверьте позднее.',
             'items': []
         }
+    data_db.close()
     return jinja.render('ev.html', request, global_items=items)
 
 
@@ -43,6 +44,7 @@ async def daily(request):
             'name': 'Нет данных. Проверьте позднее.',
             'items': []
         }
+    data_db.close()
     return jinja.render('daily.html', request, global_items=items)
 
 
@@ -60,7 +62,7 @@ async def weekly(request):
             'name': 'Нет данных, или они пока что не предоставляются. Проверьте позднее.',
             'items': []
         }]
-
+    data_db.close()
     return jinja.render('weekly.html', request, global_items=items)
 
 
@@ -81,6 +83,7 @@ async def dailyrotations(request):
         items = eval(items[0])
     else:
         items = []
+    data_db.close()
     return response.json({'Response': json.dumps(items, ensure_ascii=False)})
 
 
@@ -94,6 +97,7 @@ async def dailyrotations(request):
         items = eval(items[0])
     else:
         items = []
+    data_db.close()
     return response.json({'Response': json.dumps(items, ensure_ascii=False)})
 
 
@@ -107,6 +111,7 @@ async def seasonev(request):
         items = eval(items[0])
     else:
         items = []
+    data_db.close()
     return response.json({'Response': json.dumps(items, ensure_ascii=False)})
 
 
