@@ -300,7 +300,7 @@ class D2data:
     async def get_reckoning_modifiers(self, size='wide', langs=['ru'], forceget=False):
         activities_resp = await self.get_activities_response('reckoning', string='reckoning modifiers', force=forceget)
         if not activities_resp:
-            return
+            return {}
         for lang in langs:
             r_info = {
                 'icon': '/common/destiny2_content/icons/'
@@ -852,9 +852,14 @@ class D2data:
                      await self.get_heroic_story(size='tall'),
                      await self.get_forge()]
 
+        n_rotations = []
+        for rotation in rotations:
+            if rotation:
+                n_rotations.append(rotation)
+
         self.data_cursor.execute('''DROP TABLE dailyrotations''')
         self.data_cursor.execute('''CREATE TABLE "dailyrotations" ("items"	TEXT)''')
-        self.data_cursor.execute('''INSERT into dailyrotations VALUES (?)''', (str(rotations).replace('\"', '\\\"').replace('\'', '"'),))
+        self.data_cursor.execute('''INSERT into dailyrotations VALUES (?)''', (str(n_rotations).replace('\"', '\\\"').replace('\'', '"'),))
         self.data_db.commit()
 
     async def get_weekly_rotations(self):
@@ -890,9 +895,14 @@ class D2data:
                 'items': nightfalls
             })
 
+        n_rotations = []
+        for rotation in rotations:
+            if rotation:
+                n_rotations.append(rotation)
+
         self.data_cursor.execute('''DROP TABLE weeklyrotations''')
         self.data_cursor.execute('''CREATE TABLE "weeklyrotations" ("items"	TEXT)''')
-        self.data_cursor.execute('''INSERT into weeklyrotations VALUES (?)''', (str(rotations).replace('\"', '\\\"').replace('\'', '"'),))
+        self.data_cursor.execute('''INSERT into weeklyrotations VALUES (?)''', (str(n_rotations).replace('\"', '\\\"').replace('\'', '"'),))
         self.data_db.commit()
 
     async def decode_modifiers(self, key, lang):
