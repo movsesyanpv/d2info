@@ -53,8 +53,8 @@
 
 .mod_wrapper {
 	display: flexbox;
-	margin: 0 auto;
-	max-width: 600px;
+	margin: 0;
+	max-width: 100%;
 }
 
 .global_grid {
