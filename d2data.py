@@ -705,7 +705,9 @@ class D2data:
                         'tooltip_id': '{}_{}_{}_tooltip'.format(engram_item['itemHash'], 1337, n_order),
                         'hash': engram_item['itemHash'],
                         'name': item_def['displayProperties']['name'],
-                        'screenshot': screenshot
+                        'screenshot': screenshot,
+                        'currency_icon': engram_def['displayProperties']['icon'],
+                        'cost': 1
                     })
                     n_order += 1
         self.data_cursor.execute('''DROP TABLE season_ev''')
