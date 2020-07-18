@@ -689,6 +689,7 @@ class D2data:
 
         lang = 'ru'
         page.write('{{% block content %}}'
+                   '<div class="content-center">\n'
                    '<div class="global_grid">\n'
                    '<div class="global_item">\n'
                    '<h2>{}</h2>\n'
@@ -839,6 +840,7 @@ class D2data:
                 n_order += 1
 
         page.write('</div>\n'
+                   '</div>\n'
                    '</div>\n'
                    '</div>\n'
                    '{% endblock %}')
