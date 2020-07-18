@@ -1,0 +1,35 @@
+{% extends 'base.html' %}
+{% block title %}Сезонный Эверверс{% endblock %}
+{% block scripts %}
+<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.5.1/jquery.min.js" defer></script>
+<script src="/static/d2info.js" defer></script>
+{% endblock %}
+{% block meta %}
+<meta name="description" content="Сезонный ассортимент Эверверс"/>
+<meta property="og:description" content="Предметы, которые будут продаваться в этом сезоне у Тесс Эверис" />
+<meta property="og:title" content="Сезонный Эверверс" />
+<meta property="og:type" content="website" />
+<meta property="og:url" content="https://d2info.happyv0dka.cloud/eververse" />
+{% endblock %}
+{% block content %}
+<div class="global_grid">
+    {% for global_item in global_items %}
+        <div class="global_item">
+            <h2>{{ global_item['name'] }}</h2>
+            <div class="wrapper">
+                {% for item in global_item['items'] %}
+                    <div class="item" id="{{item['id']}}">
+                        <img alt="Item icon" class="icon" src="https://bungie.net/{{item['icon']}}">
+                        <div class="tooltip" id="{{item['tooltip_id']}}" style="left: auto">
+                            <a class="name" href="/item/?hash={{item['hash']}}"><b>{{item['name']}}</b></a><br>
+                                {{item['screenshot']}}
+                                <img alt="Currency icon" class="currency" src="https://bungie.net/{{item['currency_icon']}}">
+                                <a>{{item['cost']}}</a>
+                        </div>
+                    </div>
+                {% endfor %}
+            </div>
+        </div>
+    {% endfor %}
+</div>
+{% endblock %}

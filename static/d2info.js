@@ -8,7 +8,7 @@ function enableTooltips() {
                 var x = (e.clientX + 20),
                     y = (e.clientY + window.scrollY + 20);
                     x = this.offsetLeft + this.offsetWidth + a.outerWidth() < window.innerWidth? x : e.clientX - a.outerWidth()
-                    y = this.offsetTop + this.offsetHeight + a.outerHeight() < window.innerHeight? y : e.clientY + window.scrollY - a.outerHeight() - 20
+                    y = this.offsetTop + this.offsetHeight + a.outerHeight() - window.scrollY < window.innerHeight? y : e.clientY + window.scrollY - a.outerHeight() - 20
             }
             else{
                 var x = 0,

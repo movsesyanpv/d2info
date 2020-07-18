@@ -15,6 +15,24 @@ async def index(request):
 @app.route('/eververse')
 @jinja.template('ev.html')
 async def eververse(request):
+    data_db = sqlite3.connect('data.db')
+    data_cursor = data_db.cursor()
+    data_cursor.execute('''SELECT items FROM season_ev''')
+    items = data_cursor.fetchone()
+    if items is not None:
+        items = eval(items[0])
+    else:
+        items = {
+            'name': 'Нет данных. Проверьте позднее.',
+            'items': []
+        }
+    data_db.close()
+    return jinja.render('ev.html', request, global_items=items)
+
+
+@app.route('/evweekly')
+@jinja.template('ev_weekly.html')
+async def ev_weekly(request):
     return {}
 
 
@@ -32,6 +50,7 @@ async def daily(request):
             'name': 'Нет данных. Проверьте позднее.',
             'items': []
         }
+    data_db.close()
     return jinja.render('daily.html', request, global_items=items)
 
 
@@ -49,7 +68,7 @@ async def weekly(request):
             'name': 'Нет данных, или они пока что не предоставляются. Проверьте позднее.',
             'items': []
         }]
-
+    data_db.close()
     return jinja.render('weekly.html', request, global_items=items)
 
 
@@ -70,6 +89,7 @@ async def dailyrotations(request):
         items = eval(items[0])
     else:
         items = []
+    data_db.close()
     return response.json({'Response': json.dumps(items, ensure_ascii=False)})
 
 
@@ -83,6 +103,21 @@ async def dailyrotations(request):
         items = eval(items[0])
     else:
         items = []
+    data_db.close()
+    return response.json({'Response': json.dumps(items, ensure_ascii=False)})
+
+
+@app.route('/api/seasonev')
+async def seasonev(request):
+    data_db = sqlite3.connect('data.db')
+    data_cursor = data_db.cursor()
+    data_cursor.execute('''SELECT items FROM season_ev''')
+    items = data_cursor.fetchone()
+    if items is not None:
+        items = eval(items[0])
+    else:
+        items = []
+    data_db.close()
     return response.json({'Response': json.dumps(items, ensure_ascii=False)})
 
 
