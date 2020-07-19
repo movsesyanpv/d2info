@@ -7,8 +7,8 @@ function enableTooltips() {
             if (window.outerWidth > 600){
                 var x = (e.clientX + 20),
                     y = (e.clientY + window.scrollY + 20);
-                    x = this.offsetLeft + this.offsetWidth + a.outerWidth() < window.innerWidth? x : e.clientX - a.outerWidth()
-                    y = this.offsetTop + this.offsetHeight + a.outerHeight() - window.scrollY < window.innerHeight? y : e.clientY + window.scrollY - a.outerHeight() - 20
+                    x = this.offsetLeft + this.offsetWidth + a.outerWidth() < window.innerWidth ? x : e.clientX - a.outerWidth()
+                    y = this.offsetTop + this.offsetHeight + a.outerHeight() - window.scrollY < window.innerHeight ? y : e.clientY + window.scrollY - a.outerHeight() - 20
             }
             else{
                 var x = 0,
@@ -23,3 +23,11 @@ function enableTooltips() {
 window.onload = function() {
     enableTooltips()
 };
+function header() {
+  var x = document.getElementById("myTopnav");
+  if (x.className === "topnav") {
+    x.className += " responsive";
+  } else {
+    x.className = "topnav";
+  }
+}
