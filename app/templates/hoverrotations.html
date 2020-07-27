@@ -16,11 +16,11 @@
             <div class="wrapper">
                 {% for item in global_item['items'] %}
                     <div class="item" id="{{item['id']}}">
-                        <img alt="Item icon" class="icon" src="https://bungie.net/{{item['icon']}}">
+                        <img alt={{item['name']}}" class="icon" src="https://bungie.net/{{item['icon']}}" loading="lazy">
                         <div class="tooltip" id="{{item['tooltip_id']}}" style="left: auto">
                             <a class="name" href="/item/?hash={{item['hash']}}"><b>{{item['name']}}</b></a><br>
                                 {{item['screenshot']}}
-                                <img alt="Currency icon" class="currency" src="https://bungie.net/{{item['currency_icon']}}">
+                                <img alt="{{item['currency']}}" class="currency" src="https://bungie.net/{{item['currency_icon']}}" loading="lazy">
                                 <a>{{item['cost']}}</a>
                         </div>
                     </div>

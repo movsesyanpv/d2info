@@ -632,8 +632,8 @@ class D2data:
             definition = 'DestinyInventoryItemDefinition'
             item_def = await self.destiny.decode_hash(item['itemHash'], definition, language=lang)
             if 'screenshot' in item_def.keys():
-                screenshot = '<img alt="Screenshot" class="screenshot_hover" src="https://bungie.net{}">'.format(
-                    item_def['screenshot'])
+                screenshot = '<img alt="Screenshot" class="screenshot_hover" src="https://bungie.net{}"' \
+                             'loading="lazy">'.format(item_def['screenshot'])
             else:
                 screenshot = ''
             is_interesting = False
@@ -667,7 +667,8 @@ class D2data:
                     'name': item_def['displayProperties']['name'],
                     'screenshot': screenshot,
                     'currency_icon': currency_resp['displayProperties']['icon'],
-                    'cost': item['currencies'][0]['quantity']
+                    'cost': item['currencies'][0]['quantity'],
+                    'currency': currency_resp['displayProperties']['name']
                 })
                 n_order += 1
         engram_def = await self.destiny.decode_hash(tess_def['itemList'][-1]['itemHash'], 'DestinyInventoryItemDefinition', 'ru')
@@ -677,8 +678,8 @@ class D2data:
                 for engram_item in cat_preview['items']:
                     item_def = await self.destiny.decode_hash(engram_item['itemHash'], definition, language=lang)
                     if 'screenshot' in item_def.keys():
-                        screenshot = '<img alt="Screenshot" class="screenshot_hover" src="https://bungie.net{}">'.format(
-                            item_def['screenshot'])
+                        screenshot = '<img alt="Screenshot" class="screenshot_hover" src="https://bungie.net{}" ' \
+                                     'loading="lazy">'.format(item_def['screenshot'])
                     else:
                         screenshot = ''
                     data[3]['items'].append({
@@ -689,7 +690,8 @@ class D2data:
                         'name': item_def['displayProperties']['name'],
                         'screenshot': screenshot,
                         'currency_icon': engram_def['displayProperties']['icon'],
-                        'cost': 1
+                        'cost': 1,
+                        'currency': engram_def['displayProperties']['name']
                     })
                     n_order += 1
         self.data_cursor.execute('''DROP TABLE season_ev''')
@@ -792,8 +794,8 @@ class D2data:
                                                                    language=lang)
                     cat_number = 4
                     if 'screenshot' in item_def.keys():
-                        screenshot = '<img alt="Screenshot" class="screenshot_hover" src="https://bungie.net{}">'.format(
-                            item_def['screenshot'])
+                        screenshot = '<img alt="Screenshot" class="screenshot_hover" src="https://bungie.net{}"' \
+                                     'loading="lazy">'.format(item_def['screenshot'])
                     else:
                         screenshot = ''
                     curr_week.append({
@@ -804,7 +806,8 @@ class D2data:
                         'name': item_def['displayProperties']['name'],
                         'screenshot': screenshot,
                         'currency_icon': currency_resp['displayProperties']['icon'],
-                        'cost': item['currencies'][0]['quantity']
+                        'cost': item['currencies'][0]['quantity'],
+                        'currency': currency_resp['displayProperties']['name']
                     })
                     n_order += 1
                     n_items = n_items + 1
@@ -891,8 +894,8 @@ class D2data:
                                                                    language=lang)
                     cat_number = 9
                     if 'screenshot' in item_def.keys():
-                        screenshot = '<img alt="Screenshot" class="screenshot_hover" src="https://bungie.net{}">'.format(
-                            item_def['screenshot'])
+                        screenshot = '<img alt="Screenshot" class="screenshot_hover" src="https://bungie.net{}" ' \
+                                     'loading="lazy">'.format(item_def['screenshot'])
                     else:
                         screenshot = ''
                     curr_week.append({
@@ -903,7 +906,8 @@ class D2data:
                             'name': item_def['displayProperties']['name'],
                             'screenshot': screenshot,
                             'currency_icon': currency_resp['displayProperties']['icon'],
-                            'cost': item['currencies'][0]['quantity']
+                            'cost': item['currencies'][0]['quantity'],
+                            'currency': currency_resp['displayProperties']['name']
                         })
                     n_order += 1
                     n_items = n_items + 1
@@ -928,16 +932,6 @@ class D2data:
                     'items': [*bd[i], *featured_bd[i]]
                 })
 
-        # for lang in langs:
-        #     self.data[lang]['seasonal_eververse'].clear()
-        #     for part in self.data[lang]['seasonal_silver']:
-        #         self.data[lang]['seasonal_eververse'].append(part)
-        #     for part in self.data[lang]['seasonal_consumables']:
-        #         self.data[lang]['seasonal_eververse'].append(part)
-        #     for part in self.data[lang]['seasonal_featured_bd']:
-        #         self.data[lang]['seasonal_eververse'].append(part)
-        #     for part in self.data[lang]['seasonal_bd']:
-        #         self.data[lang]['seasonal_eververse'].append(part)
         self.data_cursor.execute('''DROP TABLE evweekly''')
         self.data_cursor.execute('''CREATE TABLE "evweekly" ("items"	TEXT)''')
         self.data_cursor.execute('''INSERT into evweekly VALUES (?)''',
