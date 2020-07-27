@@ -270,29 +270,6 @@ class D2data:
             }
         return rotations
 
-    async def get_reckoning_boss(self, lang):
-        first_reset_time = 1539709200
-        seconds_since_first = time.time() - first_reset_time
-        weeks_since_first = seconds_since_first // 604800
-        reckoning_bosses = ['swords', 'oryx']
-
-        self.data[lang]['reckoningboss'] = {
-            "thumbnail": {
-                "url": "https://www.bungie.net/common/destiny2_content/icons/DestinyActivityModeDefinition_"
-                       "e74b3385c5269da226372df8ae7f500d.png"
-            },
-            'fields': [
-                {
-                    'inline': True,
-                    "name": self.translations[lang][reckoning_bosses[int(weeks_since_first % 2)]],
-                    "value": self.translations[lang]['r_desc']
-                }
-            ],
-            "color": 1332799,
-            "type": "rich",
-            "title": self.translations[lang]['msg']['reckoningboss'],
-        }
-
     def add_reckoning_boss(self, lang):
         first_reset_time = 1539709200
         seconds_since_first = time.time() - first_reset_time
