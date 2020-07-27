@@ -12,6 +12,7 @@
 <link rel="icon" type="image/png" sizes="16x16" href="/static/favicon-16x16.png">
 <link rel="manifest" href="/static/site.webmanifest">
 {% block meta %}{% endblock %}
+
 <header class="header-fixed">
     <div class="header-limiter">
 		<h1><a href="/">d2info</a></h1>
@@ -19,7 +20,13 @@
 			<a href="/">Главная</a>
             <a href="/daily">Сегодня</a>
             <a href="/weekly">На этой неделе</a>
-			<a href="/eververse">Эверверс</a>
+			<li class="dropdown">
+				<a href="#" class="dropbtn">Эверверс</a>
+				<div class="dropdown-content">
+					<a class="drop" href="/eververse">Сезонный</a>
+					<a class="drop" href="/evweekly">Еженедельный</a>
+				</div>
+			</li>
 			<a href="/api">API</a>
 		</nav>
 	</div>

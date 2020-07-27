@@ -72,6 +72,10 @@ class D2data:
             self.data_cursor.execute('''CREATE TABLE "season_ev" ("items"	TEXT)''')
         except sqlite3.OperationalError:
             pass
+        try:
+            self.data_cursor.execute('''CREATE TABLE "evweekly" ("items"	TEXT)''')
+        except sqlite3.OperationalError:
+            pass
         self.data_db.commit()
 
     async def get_spider(self, size='tall', langs=['ru'], forceget=False):
@@ -600,9 +604,10 @@ class D2data:
     async def get_seasonal_eververse(self):
         tess_def = await self.destiny.decode_hash(3361454721, 'DestinyVendorDefinition')
 
-        data = [{
-            'name': 'Популярные предметы за яркую пыль',
-            'items': []
+        data = [
+            {
+                'name': 'Популярные предметы за яркую пыль',
+                'items': []
             },
             {
                 'name': 'Предметы за яркую пыль',
@@ -690,6 +695,252 @@ class D2data:
         self.data_cursor.execute('''DROP TABLE season_ev''')
         self.data_cursor.execute('''CREATE TABLE "season_ev" ("items"	TEXT)''')
         self.data_cursor.execute('''INSERT into season_ev VALUES (?)''',
+                                 (str(data).replace('\"', '\\\"').replace('\'', '"'),))
+        self.data_db.commit()
+
+    async def get_season_start(self):
+        manifest_url = 'https://www.bungie.net/Platform/Destiny2/Manifest/'
+        manifest_json = await self.get_bungie_json('default', manifest_url, {}, '')
+        season_url = 'https://www.bungie.net{}'.format(
+            manifest_json['Response']['jsonWorldComponentContentPaths']['en']['DestinySeasonDefinition'])
+        season_json = await self.get_bungie_json('default', season_url, {}, '')
+
+        for season in season_json:
+            try:
+                start = isoparse(season_json[season]['startDate'])
+                end = isoparse(season_json[season]['endDate'])
+                if start <= datetime.now(tz=timezone.utc) <= end:
+                    current_season = season
+                    return start
+            except KeyError:
+                pass
+
+    async def get_seasonal_featured_silver(self, langs, start):
+        tess_def = await self.destiny.decode_hash(3361454721, 'DestinyVendorDefinition')
+
+        for lang in langs:
+            self.data[lang]['seasonal_silver'].clear()
+
+            data = {
+                'thumbnail': {
+                    'url': self.icon_prefix + '/common/destiny2_content/icons/30c6cc828d7753bcca72748ba2aa83d6.png'
+                },
+                'fields': [],
+                'color': 0x38479F,
+                'type': "rich",
+                'title': self.translations[lang]['msg']['silver'],
+            }
+
+            n_items = 0
+            curr_week = dict.copy(data)
+            i_week = 1
+            class_items = 0
+            for i, item in enumerate(tess_def['itemList']):
+                if n_items == 25:
+                    curr_week['title'] = '{}{} {}'.format(self.translations[lang]['msg']['silver'],
+                                                          self.translations[lang]['msg']['week'], i_week)
+                    i_week = i_week + 1
+                    self.data[lang]['seasonal_silver'].append(dict.copy(curr_week))
+                    n_items = 0
+                    curr_week['fields'] = []
+                    class_items = 0
+                if item['displayCategoryIndex'] == 3 and item['itemHash'] != 827183327:
+                    definition = 'DestinyInventoryItemDefinition'
+                    item_def = await self.destiny.decode_hash(item['itemHash'], definition, language=lang)
+                    currency_resp = await self.destiny.decode_hash(item['currencies'][0]['itemHash'], definition,
+                                                                   language=lang)
+                    currency_cost = str(item['currencies'][0]['quantity'])
+                    currency_item = currency_resp['displayProperties']['name']
+                    item_data = {
+                        'inline': True,
+                        'name': item_def['displayProperties']['name'],
+                        'value': "{}: {} {}".format(self.translations[lang]['msg']['cost'], currency_cost,
+                                                    currency_item.capitalize())
+                    }
+                    curr_week['fields'].append(item_data)
+                    n_items = n_items + 1
+                    if item_def['classType'] < 3 or any(
+                            class_name in item_def['itemTypeDisplayName'].lower() for class_name in
+                            ['hunter', 'warlock', 'titan']):
+                        class_items = class_items + 1
+
+    async def get_seasonal_featured_bd(self, langs, start):
+        tess_def = await self.destiny.decode_hash(3361454721, 'DestinyVendorDefinition')
+
+        bd = []
+        classnames = ["охотник", "варлок", "титан"]
+
+        for lang in langs:
+
+            n_items = 0
+            curr_week = []
+            i_week = 1
+            class_items = 0
+            n_order = 0
+            for i, item in enumerate(tess_def['itemList']):
+                if n_items >= 4 and n_items - class_items / 3 * 2 >= 4:
+                    i_week = i_week + 1
+                    bd.append(list.copy(curr_week))
+                    n_items = 0
+                    curr_week = []
+                    class_items = 0
+                if item['displayCategoryIndex'] == 4 and item['itemHash'] not in [353932628, 3260482534, 3536420626,
+                                                                                  3187955025, 2638689062]:
+                    definition = 'DestinyInventoryItemDefinition'
+                    item_def = await self.destiny.decode_hash(item['itemHash'], definition, language=lang)
+                    currency_resp = await self.destiny.decode_hash(item['currencies'][0]['itemHash'], definition,
+                                                                   language=lang)
+                    cat_number = 4
+                    if 'screenshot' in item_def.keys():
+                        screenshot = '<img alt="Screenshot" class="screenshot_hover" src="https://bungie.net{}">'.format(
+                            item_def['screenshot'])
+                    else:
+                        screenshot = ''
+                    curr_week.append({
+                        'id': '{}_{}_{}'.format(item['itemHash'], cat_number, n_order),
+                        'icon': item_def['displayProperties']['icon'],
+                        'tooltip_id': '{}_{}_{}_tooltip'.format(item['itemHash'], cat_number, n_order),
+                        'hash': item['itemHash'],
+                        'name': item_def['displayProperties']['name'],
+                        'screenshot': screenshot,
+                        'currency_icon': currency_resp['displayProperties']['icon'],
+                        'cost': item['currencies'][0]['quantity']
+                    })
+                    n_order += 1
+                    n_items = n_items + 1
+                    if item_def['classType'] < 3 or any(
+                            class_name in item_def['itemTypeDisplayName'].lower() for class_name in classnames):
+                        class_items = class_items + 1
+        return bd
+
+    async def get_seasonal_consumables(self, langs, start):
+        tess_def = await self.destiny.decode_hash(3361454721, 'DestinyVendorDefinition')
+
+        for lang in langs:
+            self.data[lang]['seasonal_consumables'].clear()
+
+            data = {
+                'thumbnail': {
+                    'url': self.icon_prefix + '/common/destiny2_content/icons/30c6cc828d7753bcca72748ba2aa83d6.png'
+                },
+                'fields': [],
+                'color': 0x38479F,
+                'type': "rich",
+                'title': self.translations[lang]['msg']['bd_consumables'],
+            }
+
+            n_items = 0
+            curr_week = dict.copy(data)
+            i_week = 1
+            class_items = 0
+            for i, item in enumerate(tess_def['itemList']):
+                if n_items == 25:
+                    curr_week['title'] = '{}{} {}'.format(self.translations[lang]['msg']['bd_consumables'],
+                                                          self.translations[lang]['msg']['week'], i_week)
+                    i_week = i_week + 1
+                    self.data[lang]['seasonal_consumables'].append(dict.copy(curr_week))
+                    n_items = 0
+                    curr_week['fields'] = []
+                    class_items = 0
+                if item['displayCategoryIndex'] == 10 and item['itemHash'] not in [353932628, 3260482534, 3536420626,
+                                                                                   3187955025, 2638689062]:
+                    definition = 'DestinyInventoryItemDefinition'
+                    item_def = await self.destiny.decode_hash(item['itemHash'], definition, language=lang)
+                    currency_resp = await self.destiny.decode_hash(item['currencies'][0]['itemHash'], definition,
+                                                                   language=lang)
+                    currency_cost = str(item['currencies'][0]['quantity'])
+                    currency_item = currency_resp['displayProperties']['name']
+                    item_data = {
+                        'inline': True,
+                        'name': item_def['displayProperties']['name'],
+                        'value': "{}: {} {}".format(self.translations[lang]['msg']['cost'], currency_cost,
+                                                    currency_item.capitalize())
+                    }
+                    curr_week['fields'].append(item_data)
+                    n_items = n_items + 1
+                    if item_def['classType'] < 3 or any(
+                            class_name in item_def['itemTypeDisplayName'].lower() for class_name in
+                            ['hunter', 'warlock', 'titan']):
+                        class_items = class_items + 1
+
+    async def get_seasonal_bd(self, langs, start):
+        tess_def = await self.destiny.decode_hash(3361454721, 'DestinyVendorDefinition')
+
+        bd = []
+        classnames = ["охотник", "варлок", "титан"]
+
+        for lang in langs:
+
+            n_items = 0
+            curr_week = []
+            i_week = 1
+            class_items = 0
+            n_order = 0
+            for i, item in enumerate(tess_def['itemList']):
+                if n_items >= 7 and n_items - class_items/3*2 >= 7:
+                    i_week = i_week + 1
+                    bd.append(list.copy(curr_week))
+                    n_items = 0
+                    curr_week = []
+                    class_items = 0
+                if item['displayCategoryIndex'] == 9 and item['itemHash'] not in [353932628, 3260482534, 3536420626,
+                                                                                  3187955025, 2638689062]:
+                    definition = 'DestinyInventoryItemDefinition'
+                    item_def = await self.destiny.decode_hash(item['itemHash'], definition, language=lang)
+                    currency_resp = await self.destiny.decode_hash(item['currencies'][0]['itemHash'], definition,
+                                                                   language=lang)
+                    cat_number = 9
+                    if 'screenshot' in item_def.keys():
+                        screenshot = '<img alt="Screenshot" class="screenshot_hover" src="https://bungie.net{}">'.format(
+                            item_def['screenshot'])
+                    else:
+                        screenshot = ''
+                    curr_week.append({
+                            'id': '{}_{}_{}'.format(item['itemHash'], cat_number, n_order),
+                            'icon': item_def['displayProperties']['icon'],
+                            'tooltip_id': '{}_{}_{}_tooltip'.format(item['itemHash'], cat_number, n_order),
+                            'hash': item['itemHash'],
+                            'name': item_def['displayProperties']['name'],
+                            'screenshot': screenshot,
+                            'currency_icon': currency_resp['displayProperties']['icon'],
+                            'cost': item['currencies'][0]['quantity']
+                        })
+                    n_order += 1
+                    n_items = n_items + 1
+                    if item_def['classType'] < 3 or any(
+                            class_name in item_def['itemTypeDisplayName'].lower() for class_name in classnames):
+                        class_items = class_items + 1
+        return bd
+
+    async def get_weekly_eververse(self):
+        langs = ['ru']
+        data = []
+        start = await self.get_season_start()
+        bd = await self.get_seasonal_bd(langs, start)
+        featured_bd = await self.get_seasonal_featured_bd(langs, start)
+        # await self.get_seasonal_consumables(langs, start)
+        # await self.get_seasonal_featured_silver(langs, start)
+
+        if len(bd) == len(featured_bd):
+            for i in range(0, len(bd)):
+                data.append({
+                    'name': 'Неделя {}'.format(i + 1),
+                    'items': [*bd[i], *featured_bd[i]]
+                })
+
+        # for lang in langs:
+        #     self.data[lang]['seasonal_eververse'].clear()
+        #     for part in self.data[lang]['seasonal_silver']:
+        #         self.data[lang]['seasonal_eververse'].append(part)
+        #     for part in self.data[lang]['seasonal_consumables']:
+        #         self.data[lang]['seasonal_eververse'].append(part)
+        #     for part in self.data[lang]['seasonal_featured_bd']:
+        #         self.data[lang]['seasonal_eververse'].append(part)
+        #     for part in self.data[lang]['seasonal_bd']:
+        #         self.data[lang]['seasonal_eververse'].append(part)
+        self.data_cursor.execute('''DROP TABLE evweekly''')
+        self.data_cursor.execute('''CREATE TABLE "evweekly" ("items"	TEXT)''')
+        self.data_cursor.execute('''INSERT into evweekly VALUES (?)''',
                                  (str(data).replace('\"', '\\\"').replace('\'', '"'),))
         self.data_db.commit()
 

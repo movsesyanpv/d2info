@@ -31,9 +31,21 @@ async def eververse(request):
 
 
 @app.route('/evweekly')
-@jinja.template('ev_weekly.html')
+@jinja.template('evweekly.html')
 async def ev_weekly(request):
-    return {}
+    data_db = sqlite3.connect('data.db')
+    data_cursor = data_db.cursor()
+    data_cursor.execute('''SELECT items FROM evweekly''')
+    items = data_cursor.fetchone()
+    if items is not None:
+        items = eval(items[0])
+    else:
+        items = [{
+            'name': 'Нет данных, или они пока что не предоставляются. Проверьте позднее.',
+            'items': []
+        }]
+    data_db.close()
+    return jinja.render('evweekly.html', request, global_items=items, item_style='max-width: 400px', global_style='grid-template-columns: repeat(auto-fit, minmax(250px,1fr))')
 
 
 @app.route('/daily')
