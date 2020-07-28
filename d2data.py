@@ -585,8 +585,12 @@ class D2data:
                         objective = await self.destiny.decode_hash(r_json['challenges'][0]['objectiveHash'], obj_def,
                                                                    lang)
                         if 'Испытание из сменяемого плейлиста Горнила' in objective['displayProperties']['name'] or r_json['challenges'][0]['objectiveHash'] == 1607758693:
+                            if 'icon' in r_json['displayProperties']:
+                                icon = r_json['displayProperties']['icon']
+                            else:
+                                icon = ''
                             info = {
-                                'icon': r_json['displayProperties']['icon'],
+                                'icon': icon,
                                 "name": r_json['displayProperties']['name'],
                                 "description": r_json['displayProperties']['description']
                             }
@@ -987,11 +991,30 @@ class D2data:
 
     async def get_activities_response(self, name, lang=None, string=None, force=False):
         char_info = self.char_info
+        activities = []
+        hashes = set()
 
-        activities_url = 'https://www.bungie.net/platform/Destiny2/{}/Profile/{}/Character/{}/'. \
-            format(char_info['platform'], char_info['membershipid'], char_info['charid'][0])
-        activities_resp = await self.get_bungie_json(name, activities_url, self.activities_params, lang, string)
-        return activities_resp
+        for char in char_info['charid']:
+            activities_url = 'https://www.bungie.net/platform/Destiny2/{}/Profile/{}/Character/{}/'. \
+                format(char_info['platform'], char_info['membershipid'], char)
+            activities_resp = await self.get_bungie_json(name, activities_url, self.activities_params, lang, string)
+            if activities_resp:
+                activities.append(activities_resp)
+        activities_json = await self.get_bungie_json(name, activities_url, self.activities_params, lang, string)
+
+        if activities_json:
+            activities_json['Response']['activities']['data']['availableActivities'].clear()
+
+        if len(activities) == 0:
+            return False
+        else:
+            if len(activities) > 0:
+                for char_activities in activities:
+                    for activity in char_activities['Response']['activities']['data']['availableActivities']:
+                        if activity['activityHash'] not in hashes:
+                            activities_json['Response']['activities']['data']['availableActivities'].append(activity)
+                            hashes.add(activity['activityHash'])
+            return activities_json
 
     async def get_vendor_sales(self, lang, vendor_resp, cats, exceptions=[]):
         embed_sales = []
