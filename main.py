@@ -18,7 +18,7 @@ from d2data import D2data
 
 
 class D2info:
-    version = '0.1.1'
+    version = '0.2'
     sched = ''
     args = []
 
