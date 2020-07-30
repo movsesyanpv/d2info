@@ -997,10 +997,12 @@ class D2data:
         for char in char_info['charid']:
             activities_url = 'https://www.bungie.net/platform/Destiny2/{}/Profile/{}/Character/{}/'. \
                 format(char_info['platform'], char_info['membershipid'], char)
-            activities_resp = await self.get_bungie_json(name, activities_url, self.activities_params, lang, string)
+            activities_resp = await self.get_cached_json('activities_{}'.format(char), name, activities_url,
+                                                         self.activities_params, lang, string, force=force)
             if activities_resp:
                 activities.append(activities_resp)
-        activities_json = await self.get_bungie_json(name, activities_url, self.activities_params, lang, string)
+        activities_json = await self.get_cached_json('activities_{}'.format(char_info['charid'][-1]), name,
+                                                     activities_url, self.activities_params, lang, string, force=force)
 
         if activities_json:
             activities_json['Response']['activities']['data']['availableActivities'].clear()
@@ -1117,33 +1119,17 @@ class D2data:
             char_file = open('char.json', 'r')
             self.char_info = json.loads(char_file.read())
         except FileNotFoundError:
-            valid_input = False
-            while not valid_input:
-                print("What platform are you playing on?")
-                print("1. Xbox")
-                print("2. Playstation")
-                print("3. Steam")
-                platform = int(input())
-                if 3 >= platform >= 1:
-                    valid_input = True
-            platform = str(platform)
+            membership_url = 'https://www.bungie.net/platform/User/GetMembershipsForCurrentUser/'
+            search_resp = await session.get(url=membership_url, headers=self.headers)
+            search_json = await search_resp.json()
+            self.char_info['membershipid'] = search_json['Response']['primaryMembershipId']
+            membership_id = search_json['Response']['primaryMembershipId']
+            for membership in search_json['Response']['destinyMemberships']:
+                if membership['membershipId'] == self.char_info['membershipid']:
+                    platform = membership['membershipType']
             self.char_info['platform'] = platform
 
-            valid_input = False
-            while not valid_input:
-                name = input("What's the name of your account on there? (include # numbers): ")
-                search_url = 'https://www.bungie.net/platform/Destiny2/SearchDestinyPlayer/' + str(
-                    platform) + '/' + quote(
-                    name) + '/'
-                search_resp = await session.get(search_url, headers=self.headers)
-                search_json = await search_resp.json()
-                search = search_json['Response']
-                if len(search) > 0:
-                    valid_input = True
-                    membership_id = search[0]['membershipId']
-                    self.char_info['membershipid'] = membership_id
-
-            char_search_url = 'https://www.bungie.net/platform/Destiny2/' + platform + '/Profile/' + membership_id + '/'
+            char_search_url = 'https://www.bungie.net/platform/Destiny2/{}/Profile/{}/'.format(platform, membership_id)
             char_search_params = {
                 'components': '200'
             }
@@ -1221,3 +1207,61 @@ class D2data:
             self.oauth.get_oauth()
         else:
             await self.refresh_token(self.token['refresh'])
+
+    async def get_cached_json(self, cache_id, name, url, params=None, lang=None, string=None, change_msg=True,
+                              force=False, cache_only=False):
+        cache_cursor = self.cache_db.cursor()
+
+        try:
+            cache_cursor.execute('''SELECT json, expires, timestamp from cache WHERE id=?''', (cache_id,))
+            cached_entry = cache_cursor.fetchone()
+            if cached_entry is not None:
+                expired = datetime.now().timestamp() > cached_entry[1]
+            else:
+                expired = True
+        except sqlite3.OperationalError:
+            expired = True
+            if cache_only:
+                return False
+
+        if (expired or force) and not cache_only:
+            response = await self.get_bungie_json(name, url, params, lang, string, change_msg)
+            timestamp = datetime.utcnow().isoformat()
+            if response:
+                response_json = response
+                try:
+                    cache_cursor.execute(
+                        '''CREATE TABLE cache (id text, expires integer, json text, timestamp text);''')
+                    cache_cursor.execute('''CREATE UNIQUE INDEX cache_id ON cache(id)''')
+                    cache_cursor.execute('''INSERT OR IGNORE INTO cache VALUES (?,?,?,?)''',
+                                         (cache_id, int(datetime.now().timestamp() + 1800), json.dumps(response_json),
+                                          timestamp))
+                except sqlite3.OperationalError:
+                    try:
+                        cache_cursor.execute('''ALTER TABLE cache ADD COLUMN timestamp text''')
+                        cache_cursor.execute('''INSERT OR IGNORE INTO cache VALUES (?,?,?,?)''',
+                                             (cache_id, int(datetime.now().timestamp() + 1800),
+                                              json.dumps(response_json), timestamp))
+                    except sqlite3.OperationalError:
+                        pass
+                try:
+                    cache_cursor.execute('''INSERT OR IGNORE INTO cache VALUES (?,?,?,?)''',
+                                         (cache_id, int(datetime.now().timestamp() + 1800), json.dumps(response_json),
+                                          timestamp))
+                except sqlite3.OperationalError:
+                    pass
+                try:
+                    cache_cursor.execute('''UPDATE cache SET expires=?, json=?, timestamp=? WHERE id=?''',
+                                         (int(datetime.now().timestamp() + 1800), json.dumps(response_json), timestamp,
+                                          cache_id))
+                except sqlite3.OperationalError:
+                    pass
+            else:
+                return False
+        else:
+            timestamp = cached_entry[2]
+            response_json = json.loads(cached_entry[0])
+        self.cache_db.commit()
+        response_json['timestamp'] = timestamp
+        return response_json
+
