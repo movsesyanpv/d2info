@@ -720,6 +720,7 @@ class D2data:
                     return start
             except KeyError:
                 pass
+        return datetime.now(tz=timezone.utc)
 
     async def get_seasonal_featured_silver(self, langs, start):
         tess_def = await self.destiny.decode_hash(3361454721, 'DestinyVendorDefinition')
@@ -928,11 +929,16 @@ class D2data:
         featured_bd = await self.get_seasonal_featured_bd(langs, start)
         # await self.get_seasonal_consumables(langs, start)
         # await self.get_seasonal_featured_silver(langs, start)
-
+        week_n = datetime.now(tz=timezone.utc) - await self.get_season_start()
+        week_n = int(week_n.days / 7)
         if len(bd) == len(featured_bd):
             for i in range(0, len(bd)):
+                if week_n == i:
+                    week_str = 'Неделя {} (текущая)'.format(i + 1)
+                else:
+                    week_str = 'Неделя {}'.format(i + 1)
                 data.append({
-                    'name': 'Неделя {}'.format(i + 1),
+                    'name': week_str,
                     'items': [*bd[i], *featured_bd[i]]
                 })
 
