@@ -98,7 +98,8 @@ class D2data:
             rotations = {
                 'name': 'Паук',
                 'size': size,
-                'items': spider
+                'items': spider,
+                'template': 'table_items.html'
             }
         return rotations
 
@@ -220,7 +221,8 @@ class D2data:
             return {
                 'name': 'Героические сюжетные миссии',
                 'size': size,
-                'items': heroics
+                'items': heroics,
+                'template': 'table_items.html'
             }
 
     async def get_forge(self, size='', langs=['ru'], forceget=False):
@@ -247,7 +249,8 @@ class D2data:
             rotations = {
                 'name': 'Кузница',
                 'size': size,
-                'items': forges
+                'items': forges,
+                'template': 'table_items.html'
             }
         return rotations
 
@@ -270,7 +273,8 @@ class D2data:
             rotations = {
                 'name': 'Модификаторы плейлиста налетов',
                 'size': size,
-                'items': modifiers
+                'items': modifiers,
+                'template': 'table_items.html'
             }
         return rotations
 
@@ -306,7 +310,8 @@ class D2data:
             return {
                 'name': 'Суд',
                 'size': size,
-                'items': r_info
+                'items': r_info,
+                'template': 'table_items.html'
                 }
 
     async def get_nightfall820(self, size='', langs=['ru'], forceget=False):
@@ -339,7 +344,8 @@ class D2data:
             return {
                 'name': 'Сумрачные налеты',
                 'size': size,
-                'items': nightfalls
+                'items': nightfalls,
+                'template': 'table_items.html'
             }
         else:
             return {}
@@ -505,7 +511,8 @@ class D2data:
         return {
             'name': 'Рейды',
             'size': size,
-            'items': raids
+            'items': raids,
+            'template': 'table_items.html'
         }
 
     async def get_ordeal(self, size='', langs=['ru'], forceget=False):
@@ -540,7 +547,8 @@ class D2data:
             return {
                 'name': 'Сумрачный налет: Побоище',
                 'size': size,
-                'items': ordeal
+                'items': ordeal,
+                'template': 'table_items.html'
             }
 
     async def get_nightmares(self, size='', langs=['ru'], forceget=False):
@@ -564,7 +572,8 @@ class D2data:
             return {
                 'name': 'Охоты на кошмаров',
                 'size': size,
-                'items': nightmares
+                'items': nightmares,
+                'template': 'table_items.html'
             }
 
     async def get_crucible_rotators(self, size='wide', langs=['ru'], forceget=False):
@@ -592,7 +601,7 @@ class D2data:
                             info = {
                                 'icon': icon,
                                 "name": r_json['displayProperties']['name'],
-                                "description": r_json['displayProperties']['description']
+                                "description": r_json['displayProperties']['description'].replace('\n\n', '<br>')
                             }
                             if 'icon' in r_json['displayProperties']:
                                 info['icon'] = r_json['displayProperties']['icon']
@@ -602,7 +611,8 @@ class D2data:
         return {
             'name': 'Сменяемые режимы горнила',
             'size': size,
-            'items': rotators
+            'items': rotators,
+            'template': 'table_items.html'
         }
 
     async def get_seasonal_eververse(self):
@@ -947,6 +957,12 @@ class D2data:
         self.data_cursor.execute('''INSERT into evweekly VALUES (?)''',
                                  (str(data).replace('\"', '\\\"').replace('\'', '"'),))
         self.data_db.commit()
+        return {
+                'name': 'Эверверс',
+                'size': '',
+                'items': data[week_n]['items'],
+                'template': 'hover_items.html'
+            }
 
     async def get_daily_rotations(self):
         rotations = [await self.get_spider(),
@@ -968,6 +984,7 @@ class D2data:
     async def get_weekly_rotations(self):
         rotations = [await self.get_nightfall820(),
                      await self.get_raids(),
+                     await self.get_weekly_eververse(),
                      await self.get_nightmares(),
                      await self.get_crucible_rotators(),
                      await self.get_ordeal()]
