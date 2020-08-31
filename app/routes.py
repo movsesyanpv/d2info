@@ -216,7 +216,7 @@ async def item(request):
                          '{}\n'
                          '<h3>{}</h3>\n'
                          '<a>{}</a><br>\n'
-                         '<form method="get" action="/eververse">\n'
+                         '<form method="get" action="javascript:history.back()">\n'
                          '    <button type="submit">Вернуться назад</button>\n'
                          '</form>\n'
                          .format(item_manifest['displayProperties']['name'], item_manifest['displayProperties']['icon'],
