@@ -80,7 +80,7 @@ async def dyn_daily(request):
                               database=api_data['data_db'])
     db_cursor = data_db.cursor()
     items = []
-    db_cursor.execute('''SELECT json, name, size, template FROM ru WHERE id IN ('spider_mats', 'strike_modifiers', 'heroic_story_missions', 'forge', 'reckoning') ORDER BY place ASC''')
+    db_cursor.execute('''SELECT json, name, size, template FROM ru WHERE type='daily' ORDER BY place ASC''')
     data = db_cursor.fetchall()
     for item in data:
         items.append({
@@ -102,7 +102,7 @@ async def dyn_weekly(request):
                               database=api_data['data_db'])
     db_cursor = data_db.cursor()
     items = []
-    db_cursor.execute('''SELECT json, name, size, template FROM ru WHERE id IN ('820_nightfalls', 'raid_challenges', 'weekly_eververse', 'nightmare_hunts', 'ordeal', 'crucible_rotators') ORDER BY place ASC''')
+    db_cursor.execute('''SELECT json, name, size, template FROM ru WHERE type='weekly' ORDER BY place ASC''')
     data = db_cursor.fetchall()
     for item in data:
         items.append({
