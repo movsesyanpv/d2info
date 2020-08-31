@@ -3,7 +3,12 @@ from sanic import response
 import pydest
 import json
 import sqlite3
+import mariadb
 import markdown2
+
+
+api_data_file = open('api.json', 'r')
+api_data = json.loads(api_data_file.read())
 
 
 @app.route('/')
@@ -49,6 +54,7 @@ async def ev_weekly(request):
 
 
 @app.route('/daily')
+@app.route('/v1/daily')
 @jinja.template('daily.html')
 async def daily(request):
     data_db = sqlite3.connect('data.db')
@@ -64,6 +70,50 @@ async def daily(request):
         }
     data_db.close()
     return jinja.render('daily.html', request, global_items=items)
+
+
+@app.route('/v2/daily')
+@jinja.template('daily.html')
+async def dyn_daily(request):
+    data_db = mariadb.connect(host=api_data['db_host'], user=api_data['cache_login'],
+                              password=api_data['pass'], port=api_data['db_port'],
+                              database=api_data['data_db'])
+    db_cursor = data_db.cursor()
+    items = []
+    db_cursor.execute('''SELECT json, name, size, template FROM ru WHERE id IN ('spider_mats', 'strike_modifiers', 'heroic_story_missions', 'forge', 'reckoning') ORDER BY place ASC''')
+    data = db_cursor.fetchall()
+    for item in data:
+        items.append({
+            'name': item[1],
+            'size': item[2],
+            'items': json.loads(item[0])['data'],
+            'template': item[3]
+        })
+
+    data_db.close()
+    return jinja.render('daily.html', request, global_items=items)
+
+
+@app.route('/v2/weekly')
+@jinja.template('weekly.html')
+async def dyn_weekly(request):
+    data_db = mariadb.connect(host=api_data['db_host'], user=api_data['cache_login'],
+                              password=api_data['pass'], port=api_data['db_port'],
+                              database=api_data['data_db'])
+    db_cursor = data_db.cursor()
+    items = []
+    db_cursor.execute('''SELECT json, name, size, template FROM ru WHERE id IN ('820_nightfalls', 'raid_challenges', 'weekly_eververse', 'nightmare_hunts', 'ordeal', 'crucible_rotators') ORDER BY place ASC''')
+    data = db_cursor.fetchall()
+    for item in data:
+        items.append({
+            'name': item[1],
+            'size': item[2],
+            'items': json.loads(item[0])['data'],
+            'template': item[3]
+        })
+
+    data_db.close()
+    return jinja.render('weekly.html', request, global_items=items)
 
 
 @app.route('/weekly')

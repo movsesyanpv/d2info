@@ -10,3 +10,4 @@ markdown2
 bs4
 python-dateutil
 matplotlib
+mariadb
