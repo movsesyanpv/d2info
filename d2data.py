@@ -1084,6 +1084,7 @@ class D2data:
         try:
             resp = await session.get(url, params=params, headers=self.headers)
         except:
+            await session.close()
             return False
         try:
             resp_code = await resp.json()
@@ -1091,8 +1092,10 @@ class D2data:
         except KeyError:
             resp_code = 1
         except json.decoder.JSONDecodeError:
+            await session.close()
             return False
         except aiohttp.ContentTypeError:
+            await session.close()
             return False
         print('getting {} {}'.format(string, lang_str))
         curr_try = 2
@@ -1112,24 +1115,30 @@ class D2data:
             try:
                 resp_code = await resp.json()
             except aiohttp.ContentTypeError:
+                await session.close()
                 return False
             resp_code = resp_code['ErrorCode']
             if resp_code == 5:
+                await session.close()
                 return False
             print("{} get error".format(name), json.dumps(resp.json(), indent=4, sort_keys=True) + "\n")
+            await session.close()
             return False
         else:
             try:
                 resp_code = await resp.json()
             except aiohttp.ContentTypeError:
+                await session.close()
                 return False
             if 'ErrorCode' in resp_code.keys():
                 resp_code = resp_code['ErrorCode']
                 if resp_code == 5:
+                    await session.close()
                     return False
             else:
                 for suspected_season in resp_code:
                     if 'seasonNumber' in resp_code[suspected_season].keys():
+                        await session.close()
                         return resp_code
         await session.close()
         return await resp.json()
@@ -1141,6 +1150,7 @@ class D2data:
         try:
             char_file = open('char.json', 'r')
             self.char_info = json.loads(char_file.read())
+            await session.close()
         except FileNotFoundError:
             membership_url = 'https://www.bungie.net/platform/User/GetMembershipsForCurrentUser/'
             search_resp = await session.get(url=membership_url, headers=self.headers)
