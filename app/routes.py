@@ -117,6 +117,7 @@ async def dyn_weekly(request):
 
 
 @app.route('/weekly')
+@app.route('/v1/weekly')
 @jinja.template('weekly.html')
 async def weekly(request):
     data_db = sqlite3.connect('data.db')
