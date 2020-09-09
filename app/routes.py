@@ -53,7 +53,6 @@ async def ev_weekly(request):
     return jinja.render('evweekly.html', request, global_items=items, item_style='max-width: 400px', global_style='grid-template-columns: repeat(auto-fit, minmax(250px,1fr))')
 
 
-@app.route('/daily')
 @app.route('/v1/daily')
 @jinja.template('daily.html')
 async def daily(request):
@@ -72,7 +71,7 @@ async def daily(request):
     return jinja.render('daily.html', request, global_items=items)
 
 
-@app.route('/v2/daily')
+@app.route('/daily')
 @jinja.template('daily.html')
 async def dyn_daily(request):
     data_db = mariadb.connect(host=api_data['db_host'], user=api_data['cache_login'],
@@ -94,7 +93,7 @@ async def dyn_daily(request):
     return jinja.render('daily.html', request, global_items=items)
 
 
-@app.route('/v2/weekly')
+@app.route('/weekly')
 @jinja.template('weekly.html')
 async def dyn_weekly(request):
     data_db = mariadb.connect(host=api_data['db_host'], user=api_data['cache_login'],
@@ -116,7 +115,6 @@ async def dyn_weekly(request):
     return jinja.render('weekly.html', request, global_items=items)
 
 
-@app.route('/weekly')
 @app.route('/v1/weekly')
 @jinja.template('weekly.html')
 async def weekly(request):
