@@ -708,9 +708,9 @@ class D2data:
                         'screenshot': screenshot,
                         'costs': [
                             {
-                                'currency_icon': currency_resp['displayProperties']['icon'],
+                                'currency_icon': engram_def['displayProperties']['icon'],
                                 'cost': 1,
-                                'currency_name': currency_resp['displayProperties']['name']
+                                'currency_name': engram_def['displayProperties']['name']
                             }]
                     })
                     n_order += 1
