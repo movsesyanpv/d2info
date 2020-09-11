@@ -709,7 +709,7 @@ class D2data:
                         'costs': [
                             {
                                 'currency_icon': currency_resp['displayProperties']['icon'],
-                                'cost': item['currencies'][0]['quantity'],
+                                'cost': 1,
                                 'currency_name': currency_resp['displayProperties']['name']
                             }]
                     })
