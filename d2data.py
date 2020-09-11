@@ -680,9 +680,12 @@ class D2data:
                     'hash': item['itemHash'],
                     'name': item_def['displayProperties']['name'],
                     'screenshot': screenshot,
-                    'currency_icon': currency_resp['displayProperties']['icon'],
-                    'cost': item['currencies'][0]['quantity'],
-                    'currency': currency_resp['displayProperties']['name']
+                    'costs': [
+                        {
+                            'currency_icon': currency_resp['displayProperties']['icon'],
+                            'cost': item['currencies'][0]['quantity'],
+                            'currency_name': currency_resp['displayProperties']['name']
+                        }]
                 })
                 n_order += 1
         engram_def = await self.destiny.decode_hash(tess_def['itemList'][-1]['itemHash'], 'DestinyInventoryItemDefinition', 'ru')
@@ -703,9 +706,12 @@ class D2data:
                         'hash': engram_item['itemHash'],
                         'name': item_def['displayProperties']['name'],
                         'screenshot': screenshot,
-                        'currency_icon': engram_def['displayProperties']['icon'],
-                        'cost': 1,
-                        'currency': engram_def['displayProperties']['name']
+                        'costs': [
+                            {
+                                'currency_icon': currency_resp['displayProperties']['icon'],
+                                'cost': item['currencies'][0]['quantity'],
+                                'currency_name': currency_resp['displayProperties']['name']
+                            }]
                     })
                     n_order += 1
         self.data_cursor.execute('''DROP TABLE season_ev''')
@@ -820,9 +826,12 @@ class D2data:
                         'hash': item['itemHash'],
                         'name': item_def['displayProperties']['name'],
                         'screenshot': screenshot,
-                        'currency_icon': currency_resp['displayProperties']['icon'],
-                        'cost': item['currencies'][0]['quantity'],
-                        'currency': currency_resp['displayProperties']['name']
+                        'costs': [
+                            {
+                                'currency_icon': currency_resp['displayProperties']['icon'],
+                                'cost': item['currencies'][0]['quantity'],
+                                'currency_name': currency_resp['displayProperties']['name']
+                            }]
                     })
                     n_order += 1
                     n_items = n_items + 1
@@ -920,9 +929,12 @@ class D2data:
                             'hash': item['itemHash'],
                             'name': item_def['displayProperties']['name'],
                             'screenshot': screenshot,
-                            'currency_icon': currency_resp['displayProperties']['icon'],
-                            'cost': item['currencies'][0]['quantity'],
-                            'currency': currency_resp['displayProperties']['name']
+                            'costs': [
+                                {
+                                    'currency_icon': currency_resp['displayProperties']['icon'],
+                                    'cost': item['currencies'][0]['quantity'],
+                                    'currency_name': currency_resp['displayProperties']['name']
+                                }]
                         })
                     n_order += 1
                     n_items = n_items + 1
