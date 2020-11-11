@@ -3,7 +3,12 @@ from sanic import response
 import pydest
 import json
 import sqlite3
+import mariadb
 import markdown2
+
+
+api_data_file = open('api.json', 'r')
+api_data = json.loads(api_data_file.read())
 
 
 @app.route('/')
@@ -48,7 +53,7 @@ async def ev_weekly(request):
     return jinja.render('evweekly.html', request, global_items=items, item_style='max-width: 400px', global_style='grid-template-columns: repeat(auto-fit, minmax(250px,1fr))')
 
 
-@app.route('/daily')
+@app.route('/v1/daily')
 @jinja.template('daily.html')
 async def daily(request):
     data_db = sqlite3.connect('data.db')
@@ -66,7 +71,51 @@ async def daily(request):
     return jinja.render('daily.html', request, global_items=items)
 
 
+@app.route('/daily')
+@jinja.template('daily.html')
+async def dyn_daily(request):
+    data_db = mariadb.connect(host=api_data['db_host'], user=api_data['cache_login'],
+                              password=api_data['pass'], port=api_data['db_port'],
+                              database=api_data['data_db'])
+    db_cursor = data_db.cursor()
+    items = []
+    db_cursor.execute('''SELECT json, name, size, template FROM ru WHERE type='daily' ORDER BY place ASC''')
+    data = db_cursor.fetchall()
+    for item in data:
+        items.append({
+            'name': item[1],
+            'size': item[2],
+            'items': json.loads(item[0])['data'],
+            'template': item[3]
+        })
+
+    data_db.close()
+    return jinja.render('daily.html', request, global_items=items)
+
+
 @app.route('/weekly')
+@jinja.template('weekly.html')
+async def dyn_weekly(request):
+    data_db = mariadb.connect(host=api_data['db_host'], user=api_data['cache_login'],
+                              password=api_data['pass'], port=api_data['db_port'],
+                              database=api_data['data_db'])
+    db_cursor = data_db.cursor()
+    items = []
+    db_cursor.execute('''SELECT json, name, size, template FROM ru WHERE type='weekly' ORDER BY place ASC''')
+    data = db_cursor.fetchall()
+    for item in data:
+        items.append({
+            'name': item[1],
+            'size': item[2],
+            'items': json.loads(item[0])['data'],
+            'template': item[3]
+        })
+
+    data_db.close()
+    return jinja.render('weekly.html', request, global_items=items)
+
+
+@app.route('/v1/weekly')
 @jinja.template('weekly.html')
 async def weekly(request):
     data_db = sqlite3.connect('data.db')
@@ -166,7 +215,7 @@ async def item(request):
                          '{}\n'
                          '<h3>{}</h3>\n'
                          '<a>{}</a><br>\n'
-                         '<form method="get" action="/eververse">\n'
+                         '<form method="get" action="javascript:history.back()">\n'
                          '    <button type="submit">Вернуться назад</button>\n'
                          '</form>\n'
                          .format(item_manifest['displayProperties']['name'], item_manifest['displayProperties']['icon'],
