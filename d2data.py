@@ -651,24 +651,24 @@ class D2data:
             else:
                 screenshot = ''
             is_interesting = False
-            if item['displayCategoryIndex'] == 4 and item['itemHash'] not in [353932628, 3260482534, 3536420626,
+            if item['displayCategoryIndex'] == 2 and item['itemHash'] not in [353932628, 3260482534, 3536420626,
                                                                               3187955025, 2638689062]:
                 is_interesting = True
-                cat_number = 4
+                cat_number = 2
                 data_index = 0
-            elif item['displayCategoryIndex'] == 9 and item['itemHash'] not in [353932628, 3260482534, 3536420626,
+            elif item['displayCategoryIndex'] == 7 and item['itemHash'] not in [353932628, 3260482534, 3536420626,
                                                                                 3187955025, 2638689062]:
                 is_interesting = True
-                cat_number = 9
+                cat_number = 7
                 data_index = 1
-            elif item['displayCategoryIndex'] == 10 and item['itemHash'] not in [353932628, 3260482534, 3536420626,
+            elif item['displayCategoryIndex'] == 8 and item['itemHash'] not in [353932628, 3260482534, 3536420626,
                                                                                  3187955025, 2638689062]:
                 is_interesting = True
-                cat_number = 10
-                data_index = 2
-            elif item['displayCategoryIndex'] == 3 and item['itemHash'] != 827183327:
-                is_interesting = True
                 cat_number = 9
+                data_index = 2
+            elif item['displayCategoryIndex'] == 1 and item['itemHash'] != 827183327:
+                is_interesting = True
+                cat_number = 1
                 data_index = 4
             if is_interesting:
                 currency_resp = await self.destiny.decode_hash(item['currencies'][0]['itemHash'], definition,
@@ -801,7 +801,7 @@ class D2data:
                     n_items = 0
                     curr_week = []
                     class_items = 0
-                if item['displayCategoryIndex'] == 4 and item['itemHash'] not in [353932628, 3260482534, 3536420626,
+                if item['displayCategoryIndex'] == 2 and item['itemHash'] not in [353932628, 3260482534, 3536420626,
                                                                                   3187955025, 2638689062]:
                     definition = 'DestinyInventoryItemDefinition'
                     item_def = await self.destiny.decode_hash(item['itemHash'], definition, language=lang)
@@ -860,7 +860,7 @@ class D2data:
                     n_items = 0
                     curr_week['fields'] = []
                     class_items = 0
-                if item['displayCategoryIndex'] == 10 and item['itemHash'] not in [353932628, 3260482534, 3536420626,
+                if item['displayCategoryIndex'] == 8 and item['itemHash'] not in [353932628, 3260482534, 3536420626,
                                                                                    3187955025, 2638689062]:
                     definition = 'DestinyInventoryItemDefinition'
                     item_def = await self.destiny.decode_hash(item['itemHash'], definition, language=lang)
@@ -901,7 +901,7 @@ class D2data:
                     n_items = 0
                     curr_week = []
                     class_items = 0
-                if item['displayCategoryIndex'] == 9 and item['itemHash'] not in [353932628, 3260482534, 3536420626,
+                if item['displayCategoryIndex'] == 7 and item['itemHash'] not in [353932628, 3260482534, 3536420626,
                                                                                   3187955025, 2638689062]:
                     definition = 'DestinyInventoryItemDefinition'
                     item_def = await self.destiny.decode_hash(item['itemHash'], definition, language=lang)

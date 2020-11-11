@@ -46,7 +46,7 @@ class D2info:
         await self.data.get_chars()
         await self.data.get_seasonal_eververse()
         await self.data.get_daily_rotations()
-        await self.data.get_weekly_rotations()
+        # await self.data.get_weekly_rotations()
         await self.data.get_weekly_eververse()
 
     def start_up(self):
@@ -60,10 +60,10 @@ class D2info:
                                second='40', misfire_grace_time=86300)
             self.sched.add_job(self.data.get_weekly_eververse, 'cron', day_of_week='tue', hour='17', minute='1',
                                second='40', misfire_grace_time=86300)
-            self.sched.add_job(self.data.get_weekly_rotations, 'cron', day_of_week='tue', hour='17', minute='0',
-                               second='40', misfire_grace_time=86300)
-            self.sched.add_job(self.data.get_daily_rotations, 'cron', hour='17', minute='0', second='40',
-                               misfire_grace_time=86300)
+            # self.sched.add_job(self.data.get_weekly_rotations, 'cron', day_of_week='tue', hour='17', minute='0',
+            #                    second='40', misfire_grace_time=86300)
+            # self.sched.add_job(self.data.get_daily_rotations, 'cron', hour='17', minute='0', second='40',
+            #                    misfire_grace_time=86300)
             self.sched.start()
 
         app.static('/static', './static')
