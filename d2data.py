@@ -34,7 +34,7 @@ class D2data:
     max_retries = 10
 
     vendor_params = {
-        'components': '400,401,402'
+        'components': '400,401,402,302,304,306'
     }
 
     activities_params = {
@@ -100,6 +100,41 @@ class D2data:
                 'size': size,
                 'items': spider,
                 'template': 'table_items.html'
+            }
+        return rotations
+
+    async def get_drifter(self, size='tall', langs=['ru'], forceget=False):
+        char_info = self.char_info
+        rotations = {}
+        lang = 'ru'
+        cat_templates = {
+            '6': 'contract_item.html',
+            '0': 'weapon_item.html',
+            '4': 'armor_item.html'
+        }
+
+        drifter_url = 'https://www.bungie.net/platform/Destiny2/{}/Profile/{}/Character/{}/Vendors/248695599/'. \
+            format(char_info['platform'], char_info['membershipid'], char_info['charid'][0])
+        drifter_resp = await self.get_bungie_json('drifter', drifter_url, self.vendor_params, string='drifter')
+        if drifter_resp:
+            drifter_cats = drifter_resp['Response']['categories']['data']['categories']
+            drifter_def = await self.destiny.decode_hash(248695599, 'DestinyVendorDefinition', language=lang)
+
+            sales = []
+            for category in drifter_cats:
+                if category['displayCategoryIndex'] in [2,3]:
+                    continue
+                cat_sales = await self.get_vendor_sales(lang, drifter_resp, category['itemIndexes'], [])
+                sales.append({
+                    'name': drifter_def['displayCategories'][category['displayCategoryIndex']]['displayProperties']['name'],
+                    'items': cat_sales,
+                    'template': cat_templates[str(category['displayCategoryIndex'])]
+                })
+            rotations = {
+                'name': 'Скиталец',
+                'size': size,
+                'items': sales,
+                'template': 'vendor_items.html'
             }
         return rotations
 
@@ -1039,11 +1074,12 @@ class D2data:
             }
 
     async def get_daily_rotations(self):
-        rotations = [await self.get_spider(),
-                     await self.get_strike_modifiers(),
-                     await self.get_reckoning_modifiers(),
-                     await self.get_heroic_story(size='tall'),
-                     await self.get_forge()]
+        rotations = [await self.get_spider()#,
+                     # await self.get_strike_modifiers(),
+                     # await self.get_reckoning_modifiers(),
+                     # await self.get_heroic_story(size='tall'),
+                     # await self.get_forge()
+                     ]
 
         n_rotations = []
         for rotation in rotations:
@@ -1056,12 +1092,13 @@ class D2data:
         self.data_db.commit()
 
     async def get_weekly_rotations(self):
-        rotations = [await self.get_nightfall820(),
+        rotations = [#await self.get_nightfall820(),
                      await self.get_raids(),
                      await self.get_weekly_eververse(),
                      await self.get_nightmares(),
-                     await self.get_crucible_rotators(),
-                     await self.get_ordeal()]
+                     # await self.get_crucible_rotators(),
+                     await self.get_ordeal(),
+                     await self.get_drifter()]
 
         n_rotations = []
         for rotation in rotations:
@@ -1120,6 +1157,7 @@ class D2data:
 
         vendor_json = vendor_resp
         tess_sales = vendor_json['Response']['sales']['data']
+        n_order = 0
         for key in cats:
             item = tess_sales[str(key)]
             item_hash = item['itemHash']
@@ -1128,22 +1166,72 @@ class D2data:
                 item_resp = await self.destiny.decode_hash(item_hash, definition, language=lang)
                 item_name_list = item_resp['displayProperties']['name'].split()
                 item_name = ' '.join(item_name_list)
-                if len(item['costs']) > 0:
-                    currency = item['costs'][0]
+                costs = []
+                currency_cost = 'N/A'
+                currency_item = ''
+                if len(item['costs']) == 0:
+                    currency_cost = 'N/A'
+                    currency_item = ''
+                    costs.append({
+                        'currency_name': currency_item.capitalize(),
+                        'cost': currency_cost,
+                    })
+                for cost in item['costs']:
+                    currency = cost
                     currency_resp = await self.destiny.decode_hash(currency['itemHash'], definition, language=lang)
 
                     currency_cost = str(currency['quantity'])
                     currency_item = currency_resp['displayProperties']['name']
+                    costs.append({
+                        'currency_name': currency_item.capitalize(),
+                        'cost': currency_cost,
+                        'currency_icon': currency_resp['displayProperties']['icon']
+                    })
+
+                if 'screenshot' in item_resp.keys():
+                    screenshot = '<img alt="Screenshot" class="screenshot_hover" src="https://bungie.net{}" ' \
+                                 'loading="lazy">'.format(item_resp['screenshot'])
                 else:
-                    currency_cost = 'N/A'
-                    currency_item = ''
+                    screenshot = ''
+
+                stats = []
+                if str(item['vendorItemIndex']) in vendor_json['Response']['itemComponents']['stats']['data'].keys():
+                    stats_json = vendor_json['Response']['itemComponents']['stats']['data'][str(item['vendorItemIndex'])]['stats']
+                    for stat in stats_json:
+                        value = stats_json[stat]['value']
+                        if value == 0:
+                            continue
+                        stat_def = await self.destiny.decode_hash(stats_json[stat]['statHash'], 'DestinyStatDefinition', language=lang)
+                        stats.append({
+                            'name': stat_def['displayProperties']['name'],
+                            'value': stats_json[stat]['value']
+                        })
+
+                perks = []
+                if str(item['vendorItemIndex']) in vendor_json['Response']['itemComponents']['perks']['data'].keys():
+                    perks_json = vendor_json['Response']['itemComponents']['perks']['data'][str(item['vendorItemIndex'])]['perks']
+                    for perk in perks_json:
+                        perk_def = await self.destiny.decode_hash(perk['perkHash'], 'DestinySandboxPerkDefinition', language=lang)
+                        if 'name' in perk_def['displayProperties'].keys() and 'icon' in perk_def['displayProperties'].keys():
+                            perks.append({
+                                'name': perk_def['displayProperties']['name'],
+                                'icon': 'https://bungie.net{}'.format(perk_def['displayProperties']['icon'])
+                            })
 
                 item_data = {
+                    'id': '{}_{}_{}'.format(item['itemHash'], key, n_order),
                     'icon': item_resp['displayProperties']['icon'],
                     'name': item_name.capitalize(),
                     'description': "{}: {} {}".format('Цена', currency_cost,
-                                                currency_item.capitalize())
+                                                currency_item.capitalize()),
+                    'tooltip_id': '{}_{}_{}_tooltip'.format(item['itemHash'], key, n_order),
+                    'hash': item['itemHash'],
+                    'screenshot': screenshot,
+                    'costs': costs,
+                    'stats': stats,
+                    'perks': perks
                 }
+                n_order += 1
                 embed_sales.append(item_data)
         return embed_sales
 

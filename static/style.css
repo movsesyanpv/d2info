@@ -340,3 +340,7 @@ li.dropdown {
 .dropdown:hover .dropdown-content {
   display: block;
 }
+
+.perk_icon {
+    width: 32px
+}

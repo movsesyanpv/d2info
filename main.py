@@ -46,7 +46,7 @@ class D2info:
         await self.data.get_chars()
         await self.data.get_seasonal_eververse()
         await self.data.get_daily_rotations()
-        # await self.data.get_weekly_rotations()
+        await self.data.get_weekly_rotations()
         await self.data.get_weekly_eververse()
 
     def start_up(self):
