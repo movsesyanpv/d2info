@@ -1,0 +1,11 @@
+{% if item['perks']|length > 0 %}
+<hr>
+{% for perk_arr in item['perks'] %}
+<div>
+    {% for perk in perk_arr %}
+        <img src={{perk['icon']}} title={{perk['name']}} class="perk_icon">
+    {% endfor %}
+</div>
+{% endfor %}
+<hr>
+{% endif %}

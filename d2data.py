@@ -11,6 +11,7 @@ import sqlite3
 import matplotlib.pyplot as plt
 import csv
 import codecs
+import asyncio
 
 
 class D2data:
@@ -34,7 +35,7 @@ class D2data:
     max_retries = 10
 
     vendor_params = {
-        'components': '400,401,402,302,304,306'
+        'components': '400,401,402,302,304,306,310,305'
     }
 
     activities_params = {
@@ -134,104 +135,82 @@ class D2data:
                 'name': 'Скиталец',
                 'size': size,
                 'items': sales,
-                'template': 'vendor_items.html'
+                'template': 'vendor_items.html',
+                'annotations': []
             }
         return rotations
 
     async def get_xur_loc(self):
-        url = 'https://wherethefuckisxur.com/'
-        r = await self.session.get(url)
-        r_text = await r.text()
-        soup = BeautifulSoup(r_text, features="html.parser")
-        modifier_list = soup.find('div', {'class': 'xur-location'})
-        loc = modifier_list.find('h1', {'class': 'page-title'})
-        location = loc.text.split(' >')
-        return location[0]
+        url = 'https://paracausal.science/xur/current.json'
+        session = aiohttp.ClientSession()
+        r = await session.get(url)
+        r_json = await r.json()
+        await session.close()
 
-    async def get_xur(self, langs=['ru'], forceget=False):
+        return r_json
+
+    async def get_xur(self, langs=['ru'], size='', forceget=False):
         char_info = self.char_info
+        rotations = {}
+        lang = 'ru'
+        cat_templates = {
+            '6': 'contract_item.html',
+            '0': 'weapon_item.html',
+            '4': 'armor_item.html'
+        }
 
         xur_url = 'https://www.bungie.net/platform/Destiny2/{}/Profile/{}/Character/{}/Vendors/2190858386/'. \
             format(char_info['platform'], char_info['membershipid'], char_info['charid'][0])
         xur_resp = await self.get_bungie_json('xur', xur_url, self.vendor_params)
-        if not xur_resp:
-            return {}
-        for lang in langs:
+        xur_loc_task = asyncio.ensure_future(self.get_xur_loc())
 
+        xur_loc = await asyncio.gather(xur_loc_task)
+        xur_loc = xur_loc[0]
+
+        if xur_resp:
+            xur_cats = xur_resp['Response']['categories']['data']['categories']
             xur_def = await self.destiny.decode_hash(2190858386, 'DestinyVendorDefinition', language=lang)
-            self.data[lang]['xur'] = {
-                'thumbnail': {
-                    'url': self.icon_prefix + xur_def['displayProperties']['smallTransparentIcon']
-                },
-                'fields': [],
-                'color': 0x3DD5D6,
-                'type': "rich",
-                'title': self.translations[lang]['msg']['xurtitle'],
-                'footer': {'text': self.translations[lang]['msg']['resp_time']},
-                'timestamp': resp_time
-            }
 
-            xur_json = xur_resp
-            if not xur_json['ErrorCode'] == 1627:
-                loc_field = {
-                    "inline": False,
-                    "name": self.translations[lang]['msg']['xurloc'],
-                    "value": self.translations[lang]['xur']['NULL']
-                }
-                weapon = {
-                    'inline': False,
-                    'name': self.translations[lang]['msg']['weapon'],
-                    'value': ''
-                }
-                try:
-                    loc_field['value'] = self.translations[lang]['xur'][await self.get_xur_loc()]
-                    self.data[lang]['xur']['fields'].append(loc_field)
-                except:
-                    pass
-                xur_sales = xur_json['Response']['sales']['data']
-
-                self.data[lang]['xur']['fields'].append(weapon)
-
+            cat_sales = await self.get_vendor_sales(lang, xur_resp, xur_cats[0]['itemIndexes'], [3875551374])
+            xur_sales = xur_resp['Response']['sales']['data']
+            sales = []
+            if xur_loc:
+                xur_place_name = await self.destiny.decode_hash(xur_loc['placeHash'], 'DestinyPlaceDefinition',
+                                                                language=lang)
+                xur_destination_name = await self.destiny.decode_hash(xur_loc['destinationHash'],
+                                                                      'DestinyDestinationDefinition', language=lang)
+                sales = [{'name': '{}, {}'.format(xur_place_name['displayProperties']['name'], xur_destination_name['displayProperties']['name']),
+                          'items': [], 'template': cat_templates['6']},
+                         {'name': 'Оружие', 'items': [], 'template': cat_templates['0']},
+                         {'name': 'Броня', 'items': [], 'template': cat_templates['4']}]
                 for key in sorted(xur_sales.keys()):
                     item_hash = xur_sales[key]['itemHash']
-                    if item_hash not in [4285666432, 2293314698]:
+                    if item_hash not in [4285666432, 2293314698, 2125848607, 3875551374]:
                         definition = 'DestinyInventoryItemDefinition'
                         item_resp = await self.destiny.decode_hash(item_hash, definition, language=lang)
                         item_name = item_resp['displayProperties']['name']
                         if item_resp['itemType'] == 2:
-                            item_sockets = item_resp['sockets']['socketEntries']
-                            plugs = []
-                            for s in item_sockets:
-                                if len(s['reusablePlugItems']) > 0 and s['plugSources'] == 2:
-                                    plugs.append(s['reusablePlugItems'][0]['plugItemHash'])
-
-                            exotic = {
-                                'inline': True,
-                                'name': '',
-                                'value': item_name
-                            }
-
-                            if item_resp['classType'] == 0:
-                                exotic['name'] = self.translations[lang]['Titan']
-                            elif item_resp['classType'] == 1:
-                                exotic['name'] = self.translations[lang]['Hunter']
-                            elif item_resp['classType'] == 2:
-                                exotic['name'] = self.translations[lang]['Warlock']
-
-                            self.data[lang]['xur']['fields'].append(exotic)
+                            for item in cat_sales:
+                                if item['hash'] == item_hash:
+                                    sales[2]['items'].append(item)
                         else:
-                            i = 0
-                            for item in self.data[lang]['xur']['fields']:
-                                if item['name'] == self.translations[lang]['msg']['weapon']:
-                                    self.data[lang]['xur']['fields'][i]['value'] = item_name
-                                i += 1
-            else:
-                loc_field = {
-                    "inline": False,
-                    "name": self.translations[lang]['msg']['xurloc'],
-                    "value": self.translations[lang]['xur']['noxur']
-                }
-                self.data[lang]['xur']['fields'].append(loc_field)
+                            for item in cat_sales:
+                                if item['hash'] == item_hash:
+                                    sales[1]['items'].append(item)
+                # sales.append({
+                #     'name': xur_def['displayCategories'][category['displayCategoryIndex']]['displayProperties']['name'],
+                #     'items': cat_sales,
+                #     'template': cat_templates[str(category['displayCategoryIndex'])]
+                # })
+
+            rotations = {
+                'name': 'Зур',
+                'size': size,
+                'items': sales,
+                'template': 'vendor_items.html',
+                'annotations': ['Данные о местоположении предоставлены сервисом paracausal.science']
+            }
+        return rotations
 
     async def get_heroic_story(self, size='wide', langs=['ru'], forceget=False):
         activities_resp = await self.get_activities_response('heroicstory', string='heroic story missions',
@@ -1074,7 +1053,8 @@ class D2data:
             }
 
     async def get_daily_rotations(self):
-        rotations = [await self.get_spider()#,
+        rotations = [await self.get_spider(),
+                     await self.get_xur()
                      # await self.get_strike_modifiers(),
                      # await self.get_reckoning_modifiers(),
                      # await self.get_heroic_story(size='tall'),
@@ -1209,14 +1189,29 @@ class D2data:
 
                 perks = []
                 if str(item['vendorItemIndex']) in vendor_json['Response']['itemComponents']['perks']['data'].keys():
-                    perks_json = vendor_json['Response']['itemComponents']['perks']['data'][str(item['vendorItemIndex'])]['perks']
-                    for perk in perks_json:
-                        perk_def = await self.destiny.decode_hash(perk['perkHash'], 'DestinySandboxPerkDefinition', language=lang)
-                        if 'name' in perk_def['displayProperties'].keys() and 'icon' in perk_def['displayProperties'].keys():
-                            perks.append({
-                                'name': perk_def['displayProperties']['name'],
-                                'icon': 'https://bungie.net{}'.format(perk_def['displayProperties']['icon'])
-                            })
+                    try:
+                        plugs_json = vendor_json['Response']['itemComponents']['reusablePlugs']['data'][str(item['vendorItemIndex'])]['plugs']
+                        plug_str = 'plugItemHash'
+                    except KeyError:
+                        plugs_json = vendor_json['Response']['itemComponents']['sockets']['data'][str(item['vendorItemIndex'])]['sockets']
+                        plug_str = 'plugHash'
+                    plug = []
+                    for perk in plugs_json:
+                        if type(perk) == str:
+                            perk_list = plugs_json[perk]
+                        elif type(perk) == dict:
+                            perk_list = [perk]
+                        else:
+                            raise TypeError
+                        for perk_dict in perk_list:
+                            if plug_str in perk_dict.keys():
+                                perk_def = await self.destiny.decode_hash(perk_dict[plug_str], 'DestinyInventoryItemDefinition', language=lang)
+                                if 'name' in perk_def['displayProperties'].keys() and 'icon' in perk_def['displayProperties'].keys():
+                                    plug.append({
+                                        'name': perk_def['displayProperties']['name'],
+                                        'icon': 'https://bungie.net{}'.format(perk_def['displayProperties']['icon'])
+                                    })
+                    perks.append(plug)
 
                 item_data = {
                     'id': '{}_{}_{}'.format(item['itemHash'], key, n_order),

@@ -1,0 +1,28 @@
+<div class="global_item {{ global_item['size'] }}" style="{{ item_style }}">
+    <h2>{{ global_item['name'] }}</h2>
+    <div class="mod_wrapper">
+        {% for category in global_item['items'] %}
+            <h3>{{category['name']}}</h3>
+            <div class="wrapper">
+            {% for item in category['items'] %}
+                <div class="item" id="{{item['id']}}">
+                    <img alt={{item['name']}}" class="icon" src="https://bungie.net/{{item['icon']}}" loading="lazy" width="64" height="64">
+                    <div class="tooltip" id="{{item['tooltip_id']}}" style="left: auto">
+                        <a class="name" href="/item/?hash={{item['hash']}}"><b>{{item['name']}}</b></a><br>
+                            {{item['screenshot']}}
+                            {% include category['template'] %}
+                            {% for cost in item['costs'] %}
+                                <img alt="{{cost['currency_name']}}" class="currency" src="https://bungie.net/{{cost['currency_icon']}}" loading="lazy">
+                                <a>{{cost['cost']}}</a><br>
+                            {% endfor %}
+                    </div>
+                </div>
+            {% endfor %}
+            </div>
+        {% endfor %}
+        {% for annotation in global_item['annotations'] %}
+        <hr>
+        <a>{{annotation}}</a><br>
+        {% endfor %}
+    </div>
+</div>

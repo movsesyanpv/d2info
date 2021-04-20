@@ -1,0 +1,9 @@
+{% if item['stats']|length > 0 %}
+<hr>
+<div class="stats">
+{% for stat in item['stats'] %}
+    <div class="stat_name">{{stat['name']}}</div><div class="stat_value">{{stat['value']}}</div><div class="progress"><div class="progress_value" style="width: {{ stat['value']/42*100 }}%"></div></div>
+{% endfor %}
+</div>
+<hr>
+{% endif %}
