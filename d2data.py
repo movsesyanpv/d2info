@@ -1133,7 +1133,7 @@ class D2data:
             return activities_json
 
     async def get_vendor_sales(self, lang, vendor_resp, cats, exceptions=[]):
-        embed_sales = []
+        data_sales = []
 
         vendor_json = vendor_resp
         tess_sales = vendor_json['Response']['sales']['data']
@@ -1227,8 +1227,8 @@ class D2data:
                     'perks': perks
                 }
                 n_order += 1
-                embed_sales.append(item_data)
-        return embed_sales
+                data_sales.append(item_data)
+        return data_sales
 
     async def get_bungie_json(self, name, url, params=None, lang=None, string=None, change_msg=True):
         session = aiohttp.ClientSession()

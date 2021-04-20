@@ -79,14 +79,15 @@ async def dyn_daily(request):
                               database=api_data['data_db'])
     db_cursor = data_db.cursor()
     items = []
-    db_cursor.execute('''SELECT json, name, size, template FROM ru WHERE type='daily' ORDER BY place ASC''')
+    db_cursor.execute('''SELECT json, name, size, template, annotations FROM ru WHERE type='daily' ORDER BY place ASC''')
     data = db_cursor.fetchall()
     for item in data:
         items.append({
             'name': item[1],
             'size': item[2],
             'items': json.loads(item[0])['data'],
-            'template': item[3]
+            'template': item[3],
+            'annotations': eval(item[4])
         })
 
     data_db.close()
@@ -101,14 +102,15 @@ async def dyn_weekly(request):
                               database=api_data['data_db'])
     db_cursor = data_db.cursor()
     items = []
-    db_cursor.execute('''SELECT json, name, size, template FROM ru WHERE type='weekly' ORDER BY place ASC''')
+    db_cursor.execute('''SELECT json, name, size, template, annotations FROM ru WHERE type='weekly' ORDER BY place ASC''')
     data = db_cursor.fetchall()
     for item in data:
         items.append({
             'name': item[1],
             'size': item[2],
             'items': json.loads(item[0])['data'],
-            'template': item[3]
+            'template': item[3],
+            'annotations': eval(item[4])
         })
 
     data_db.close()
