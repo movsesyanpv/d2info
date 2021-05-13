@@ -128,6 +128,16 @@ html {
 	margin-right: auto
 }
 
+.perk{
+	display: flex;
+	flex-direction: column;
+}
+
+.perk_tree{
+	display: flex;
+	flex-direction: row;
+}
+
 .icon {
 	margin: 1px;
 	max-width: 64px;
