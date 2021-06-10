@@ -10,4 +10,4 @@ markdown2
 bs4
 python-dateutil
 matplotlib
-mariadb
+mariadb>=1.0.7
