@@ -670,12 +670,12 @@ class D2data:
                 is_interesting = True
                 cat_number = 2
                 data_index = 0
-            elif item['displayCategoryIndex'] == 9 and item['itemHash'] not in [353932628, 3260482534, 3536420626,
+            elif item['displayCategoryIndex'] == 8 and item['itemHash'] not in [353932628, 3260482534, 3536420626,
                                                                                 3187955025, 2638689062]:
                 is_interesting = True
                 cat_number = 7
                 data_index = 1
-            elif item['displayCategoryIndex'] == 8 and item['itemHash'] not in [353932628, 3260482534, 3536420626,
+            elif item['displayCategoryIndex'] == 9 and item['itemHash'] not in [353932628, 3260482534, 3536420626,
                                                                                  3187955025, 2638689062]:
                 is_interesting = True
                 cat_number = 9
