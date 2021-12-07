@@ -670,7 +670,7 @@ class D2data:
                 is_interesting = True
                 cat_number = 2
                 data_index = 0
-            elif item['displayCategoryIndex'] == 7 and item['itemHash'] not in [353932628, 3260482534, 3536420626,
+            elif item['displayCategoryIndex'] == 9 and item['itemHash'] not in [353932628, 3260482534, 3536420626,
                                                                                 3187955025, 2638689062]:
                 is_interesting = True
                 cat_number = 7
@@ -685,8 +685,13 @@ class D2data:
                 cat_number = 1
                 data_index = 3
             if is_interesting:
-                currency_resp = await self.destiny.decode_hash(item['currencies'][0]['itemHash'], definition,
-                                                               language=lang)
+                item_def = await self.destiny.decode_hash(item['itemHash'], definition, language=lang)
+                if len(item['currencies']) > 0:
+                    currency_resp = await self.destiny.decode_hash(item['currencies'][0]['itemHash'], definition,
+                                                                   language=lang)
+                else:
+                    currency_resp = {'displayProperties': {'icon': '', 'name': ''}}
+                    item['currencies'] = [{'quantity': ''}]
                 data[data_index]['items'].append({
                     'id': '{}_{}_{}'.format(item['itemHash'], cat_number, n_order),
                     'icon': item_def['displayProperties']['icon'],
