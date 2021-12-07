@@ -876,7 +876,7 @@ class D2data:
                     n_items = 0
                     curr_week = []
                     class_items = 0
-                if item['displayCategoryIndex'] == 8 and item['categoryIndex'] == 51:
+                if item['displayCategoryIndex'] == 10 and item['categoryIndex'] == 51:
                     definition = 'DestinyInventoryItemDefinition'
                     item_def = await self.destiny.decode_hash(item['itemHash'], definition, language=lang)
                     currency_resp = await self.destiny.decode_hash(item['currencies'][0]['itemHash'], definition,
@@ -927,7 +927,7 @@ class D2data:
                     n_items = 0
                     curr_week = []
                     class_items = 0
-                if item['displayCategoryIndex'] == 8 and item['categoryIndex'] == 52:
+                if item['displayCategoryIndex'] == 9 and item['categoryIndex'] == 52:
                     definition = 'DestinyInventoryItemDefinition'
                     item_def = await self.destiny.decode_hash(item['itemHash'], definition, language=lang)
                     currency_resp = await self.destiny.decode_hash(item['currencies'][0]['itemHash'], definition,
@@ -979,7 +979,7 @@ class D2data:
                     n_items = 0
                     curr_week = []
                     class_items = 0
-                if item['displayCategoryIndex'] == 7 and item['itemHash'] not in [353932628, 3260482534, 3536420626,
+                if item['displayCategoryIndex'] == 8 and item['itemHash'] not in [353932628, 3260482534, 3536420626,
                                                                                   3187955025, 2638689062]:
                     definition = 'DestinyInventoryItemDefinition'
                     item_def = await self.destiny.decode_hash(item['itemHash'], definition, language=lang)
@@ -1022,13 +1022,13 @@ class D2data:
         # transmat = await self.get_seasonal_transmats(langs, start)
         silver = await self.get_seasonal_featured_silver(langs, start)
         week_n = datetime.now(tz=timezone.utc) - await self.get_season_start()
-        week_n = int(week_n.days / 7)
+        week_n = int(week_n.days / 7) - 15
 
         for i in range(0, len(bd)):
             if week_n == i:
-                week_str = 'Неделя {} (текущая)'.format(i + 1)
+                week_str = 'Неделя {} (текущая)'.format(i + 1 + 15)
             else:
-                week_str = 'Неделя {}'.format(i + 1)
+                week_str = 'Неделя {}'.format(i + 1 + 15)
             data.append({
                 'name': week_str,
                 'items': [*bd[i]]
