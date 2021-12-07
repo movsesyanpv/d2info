@@ -775,8 +775,13 @@ class D2data:
                 if item['displayCategoryIndex'] == 1 and item['categoryIndex'] != 37:
                     definition = 'DestinyInventoryItemDefinition'
                     item_def = await self.destiny.decode_hash(item['itemHash'], definition, language=lang)
-                    currency_resp = await self.destiny.decode_hash(item['currencies'][0]['itemHash'], definition,
-                                                                   language=lang)
+                    item_def = await self.destiny.decode_hash(item['itemHash'], definition, language=lang)
+                    if len(item['currencies']) > 0:
+                        currency_resp = await self.destiny.decode_hash(item['currencies'][0]['itemHash'], definition,
+                                                                       language=lang)
+                    else:
+                        currency_resp = {'displayProperties': {'icon': '', 'name': ''}}
+                        item['currencies'] = [{'quantity': ''}]
                     cat_number = 4
                     if 'screenshot' in item_def.keys():
                         screenshot = '<img alt="Screenshot" class="screenshot_hover" src="https://bungie.net{}"' \
@@ -828,8 +833,13 @@ class D2data:
                                                                                   3187955025, 2638689062]:
                     definition = 'DestinyInventoryItemDefinition'
                     item_def = await self.destiny.decode_hash(item['itemHash'], definition, language=lang)
-                    currency_resp = await self.destiny.decode_hash(item['currencies'][0]['itemHash'], definition,
-                                                                   language=lang)
+                    item_def = await self.destiny.decode_hash(item['itemHash'], definition, language=lang)
+                    if len(item['currencies']) > 0:
+                        currency_resp = await self.destiny.decode_hash(item['currencies'][0]['itemHash'], definition,
+                                                                       language=lang)
+                    else:
+                        currency_resp = {'displayProperties': {'icon': '', 'name': ''}}
+                        item['currencies'] = [{'quantity': ''}]
                     cat_number = 4
                     if 'screenshot' in item_def.keys():
                         screenshot = '<img alt="Screenshot" class="screenshot_hover" src="https://bungie.net{}"' \
@@ -879,8 +889,13 @@ class D2data:
                 if item['displayCategoryIndex'] == 10 and item['categoryIndex'] == 51:
                     definition = 'DestinyInventoryItemDefinition'
                     item_def = await self.destiny.decode_hash(item['itemHash'], definition, language=lang)
-                    currency_resp = await self.destiny.decode_hash(item['currencies'][0]['itemHash'], definition,
-                                                                   language=lang)
+                    item_def = await self.destiny.decode_hash(item['itemHash'], definition, language=lang)
+                    if len(item['currencies']) > 0:
+                        currency_resp = await self.destiny.decode_hash(item['currencies'][0]['itemHash'], definition,
+                                                                       language=lang)
+                    else:
+                        currency_resp = {'displayProperties': {'icon': '', 'name': ''}}
+                        item['currencies'] = [{'quantity': ''}]
                     cat_number = 4
                     if 'screenshot' in item_def.keys():
                         screenshot = '<img alt="Screenshot" class="screenshot_hover" src="https://bungie.net{}"' \
@@ -930,8 +945,13 @@ class D2data:
                 if item['displayCategoryIndex'] == 9 and item['categoryIndex'] == 52:
                     definition = 'DestinyInventoryItemDefinition'
                     item_def = await self.destiny.decode_hash(item['itemHash'], definition, language=lang)
-                    currency_resp = await self.destiny.decode_hash(item['currencies'][0]['itemHash'], definition,
-                                                                   language=lang)
+                    item_def = await self.destiny.decode_hash(item['itemHash'], definition, language=lang)
+                    if len(item['currencies']) > 0:
+                        currency_resp = await self.destiny.decode_hash(item['currencies'][0]['itemHash'], definition,
+                                                                       language=lang)
+                    else:
+                        currency_resp = {'displayProperties': {'icon': '', 'name': ''}}
+                        item['currencies'] = [{'quantity': ''}]
                     cat_number = 4
                     if 'screenshot' in item_def.keys():
                         screenshot = '<img alt="Screenshot" class="screenshot_hover" src="https://bungie.net{}"' \
@@ -983,8 +1003,13 @@ class D2data:
                                                                                   3187955025, 2638689062]:
                     definition = 'DestinyInventoryItemDefinition'
                     item_def = await self.destiny.decode_hash(item['itemHash'], definition, language=lang)
-                    currency_resp = await self.destiny.decode_hash(item['currencies'][0]['itemHash'], definition,
-                                                                   language=lang)
+                    item_def = await self.destiny.decode_hash(item['itemHash'], definition, language=lang)
+                    if len(item['currencies']) > 0:
+                        currency_resp = await self.destiny.decode_hash(item['currencies'][0]['itemHash'], definition,
+                                                                       language=lang)
+                    else:
+                        currency_resp = {'displayProperties': {'icon': '', 'name': ''}}
+                        item['currencies'] = [{'quantity': ''}]
                     cat_number = 9
                     if 'screenshot' in item_def.keys():
                         screenshot = '<img alt="Screenshot" class="screenshot_hover" src="https://bungie.net{}" ' \
