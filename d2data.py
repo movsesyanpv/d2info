@@ -1052,13 +1052,13 @@ class D2data:
         # transmat = await self.get_seasonal_transmats(langs, start)
         silver = await self.get_seasonal_featured_silver(langs, start)
         week_n = datetime.now(tz=timezone.utc) - await self.get_season_start()
-        week_n = int(week_n.days / 7) - 15
+        week_n = int(week_n.days / 7)
 
         for i in range(0, len(bd)):
             if week_n == i:
-                week_str = 'Неделя {} (текущая)'.format(i + 1 + 15)
+                week_str = 'Неделя {} (текущая)'.format(i + 1)
             else:
-                week_str = 'Неделя {}'.format(i + 1 + 15)
+                week_str = 'Неделя {}'.format(i + 1)
             data.append({
                 'name': week_str,
                 'items': [*bd[i]]
