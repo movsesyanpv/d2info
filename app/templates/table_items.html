@@ -20,5 +20,9 @@
             </table>
         </div>
         {% endfor %}
+        {% for annotation in global_item['annotations'] %}
+        <hr>
+        <a>{{annotation}}</a><br>
+        {% endfor %}
     </div>
 </div>

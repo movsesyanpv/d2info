@@ -17,6 +17,31 @@ async def index(request):
     return {}
 
 
+@app.route('/bot_status')
+@jinja.template('status.html')
+async def status(request):
+    data_db = mariadb.connect(host=api_data['db_host'], user=api_data['cache_login'],
+                              password=api_data['pass'], port=api_data['db_port'],
+                              database=api_data['data_db'])
+    db_cursor = data_db.cursor()
+    items = []
+    db_cursor.execute(
+        '''SELECT json, name, size, template, annotations FROM status WHERE type='daily' ORDER BY timestamp DESC''')
+    data = db_cursor.fetchall()
+    for item in data:
+        items.append({
+            'name': item[1],
+            'size': item[2],
+            'items': json.loads(item[0])['data'],
+            'template': item[3],
+            'annotations': eval(item[4])
+        })
+
+    data_db.close()
+    return jinja.render('status.html', request, global_items=items)
+
+
+
 @app.route('/eververse')
 @jinja.template('ev.html')
 async def eververse(request):
