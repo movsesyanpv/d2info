@@ -22,6 +22,8 @@ function enableTooltips() {
 }
 window.onload = function() {
     enableTooltips()
+    var hiddenElement = document.getElementById("main_point");
+    hiddenElement.scrollIntoView({block: "center", behavior: "smooth"});
 };
 function header() {
   var x = document.getElementById("myTopnav");

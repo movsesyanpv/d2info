@@ -1,0 +1,57 @@
+{% extends 'base.html' %}
+
+{% block title %}d2info{% endblock %}
+
+{% block meta %}
+<meta name="description" content="Indeedstor (Дустанатор) - бот для Destiny 2"/>
+<meta property="og:description" content="Indeedstor (Дустанатор) - бот для Destiny 2" />
+<meta property="og:title" content="Indeedstor" />
+<meta property="og:type" content="website" />
+<meta property="og:url" content="https://d2info.happyv0dka.cloud/indeedstor" />
+{% endblock %}
+
+{% block scripts %}
+<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.5.1/jquery.min.js" defer></script>
+<script src="/static/d2info.js" defer></script>
+{% endblock %}
+
+{% block content %}
+<div class="content-center" style="max-width: 1200px">
+    <div class="mod_grid">
+        <div class="tall">
+            <img src="/static/autopost_screenshot.png" style="max-height: 600px; padding-top: 10px; margin-left: auto; margin-right: auto;  display: block;">
+        </div>
+        <div class="tall" id="main_point" style="align-self: end;">
+            <h1>Indeedstor (Дустанатор) - бот для Destiny 2</h1>
+            <p>
+                <a href="https://discord.com/oauth2/authorize?client_id=677145368894373965&permissions=395204623424&scope=bot%20applications.commands">Indeedstor (Дустанатор)</a> - многофункциональный бот по Destiny 2. Он предоставляет актуальную информацию о мире игры. С помощью бота можно строить клановые списки лидеров и организовывать сборы в активности.
+            </p>
+            <a href="https://discord.gg/JEbzECp" class="button">Сервер Discord</a>
+            <a href="https://discord.com/oauth2/authorize?client_id=677145368894373965&permissions=395204623424&scope=bot%20applications.commands" class="button">Добавить бота</a>
+        </div>
+    </div>
+    <h1 align="center" style="padding-top: 10px">Возможности</h1>
+    <div class="mod_grid">
+        <div>
+            <h2>Информация о ресетах</h2>
+            <p>После каждого ресета бот отправляет информацию о мире Destiny 2 в зарегистрированные каналы</p>
+        </div>
+        <div>
+            <h2>Списки лидеров клана</h2>
+            <p>Можно строить рейтинги членов клана по любым метрикам, которые можно надеть на эмблему в игре</p>
+        </div>
+        <div>
+            <h2>Организация сборов</h2>
+            <p>Создавайте сборы в активности. Для добавления в список достаточно нажать на соответствующую кнопку под сбором. Возможно ручное одобрение желающих</p>
+        </div>
+        <div>
+            <h2>Слеш-команды</h2>
+            <p>Бот полностью поддерживает слеш-команды</p>
+        </div>
+        <div>
+            <h2>Многоязычность</h2>
+            <p>Бот поддерживает те же языки, что и Destiny 2. Локализация выполнена пользователями бота</p>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -17,6 +17,12 @@ async def index(request):
     return {}
 
 
+@app.route('/indeedstor')
+@jinja.template('indeedstor.html')
+async def index(request):
+    return {}
+
+
 @app.route('/bot_status')
 @jinja.template('status.html')
 async def status(request):
@@ -39,7 +45,6 @@ async def status(request):
 
     data_db.close()
     return jinja.render('status.html', request, global_items=items)
-
 
 
 @app.route('/eververse')
