@@ -5,7 +5,7 @@
             <div class="item" id="{{item['id']}}">
                 <img alt={{item['name']}}" class="icon" src="https://bungie.net/{{item['icon']}}" loading="lazy" width="64" height="64">
                 <div class="tooltip" id="{{item['tooltip_id']}}" style="left: auto">
-                    <a class="name" href="/item/?hash={{item['hash']}}"><b>{{item['name']}}</b></a><br>
+                    <a class="name" href="/item/{{item['hash']}}"><b>{{item['name']}}</b></a><br>
                         {{item['screenshot']}}
                         {% for cost in item['costs'] %}
                             <img alt="{{cost['currency_name']}}" class="currency" src="https://bungie.net/{{cost['currency_icon']}}" loading="lazy">

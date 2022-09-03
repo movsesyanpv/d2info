@@ -214,12 +214,12 @@ async def seasonev(request):
     return response.json({'Response': json.dumps(items, ensure_ascii=False)})
 
 
-@app.route('/item')
-async def item(request):
+@app.route('/item/<hash>')
+async def item(request, hash):
     api_data_file = open('api.json', 'r')
     api_data = json.loads(api_data_file.read())
     d2 = pydest.Pydest(api_data['key'])
-    item_manifest = await d2.decode_hash(request.args['hash'][0], 'DestinyInventoryItemDefinition', language='ru')
+    item_manifest = await d2.decode_hash(hash, 'DestinyInventoryItemDefinition', language='ru')
     if 'screenshot' in item_manifest.keys():
         screenshot = '<img class="screenshot" src="https://bungie.net{}">'.format(item_manifest['screenshot'])
     else:
@@ -252,3 +252,39 @@ async def item(request):
                          '</form>\n'
                          .format(item_manifest['displayProperties']['name'], item_manifest['displayProperties']['icon'],
                                  screenshot, item_manifest['displayProperties']['name'], item_manifest['displayProperties']['description']))
+
+
+@app.route("/sitemap")
+def sitemap(request):
+    """
+        Route to dynamically generate a sitemap of your website/application.
+        lastmod and priority tags omitted on static pages.
+        lastmod included on dynamic content such as blog posts.
+    """
+    import datetime
+    from urllib.parse import urlparse
+
+    host_components = urlparse(request.url)
+    host_base = host_components.scheme + "://" + host_components.netloc
+
+    # Static routes with static content
+    static_urls = list()
+    for rule in app.router.static_routes.items():
+        if not rule[1].path.startswith("admin") and not rule[1].path.startswith("user"):
+            if "GET" in rule[1].methods:# and len(rule.arguments) == 0:
+                url = {
+                    "loc": f"{host_base}/{rule[1].path}"
+                }
+                static_urls.append(url)
+
+    # Dynamic routes with dynamic content
+    dynamic_urls = list()
+    # blog_posts = Post.objects(published=True)
+    # for post in blog_posts:
+    #     url = {
+    #         "loc": f"{host_base}/blog/{post.category.name}/{post.url}",
+    #         "lastmod": post.date_published.strftime("%Y-%m-%dT%H:%M:%SZ")
+    #         }
+    #     dynamic_urls.append(url)
+
+    return jinja.render("sitemap.xml", request, static_urls=static_urls, dynamic_urls=dynamic_urls, host_base=host_base)
