@@ -109,7 +109,15 @@ async def dyn_daily(request):
                               database=api_data['data_db'])
     db_cursor = data_db.cursor()
     items = []
-    db_cursor.execute('''SELECT json, name, size, template, annotations FROM ru WHERE type='daily' ORDER BY place ASC''')
+
+    langs = request.headers.get('accept-language')
+
+    if 'ru' in langs.split(';')[0].split(',')[0].replace('-', '_'):
+        lang = 'ru'
+    else:
+        lang = 'en'
+
+    db_cursor.execute('''SELECT json, name, size, template, annotations FROM {} WHERE type='daily' ORDER BY place ASC'''.format(lang))
     data = db_cursor.fetchall()
     for item in data:
         items.append({
@@ -132,7 +140,15 @@ async def dyn_weekly(request):
                               database=api_data['data_db'])
     db_cursor = data_db.cursor()
     items = []
-    db_cursor.execute('''SELECT json, name, size, template, annotations FROM ru WHERE type='weekly' ORDER BY place ASC''')
+
+    langs = request.headers.get('accept-language')
+
+    if 'ru' in langs.split(';')[0].split(',')[0].replace('-', '_'):
+        lang = 'ru'
+    else:
+        lang = 'en'
+
+    db_cursor.execute('''SELECT json, name, size, template, annotations FROM {} WHERE type='weekly' ORDER BY place ASC'''.format(lang))
     data = db_cursor.fetchall()
     for item in data:
         items.append({
@@ -219,7 +235,15 @@ async def item(request, hash):
     api_data_file = open('api.json', 'r')
     api_data = json.loads(api_data_file.read())
     d2 = pydest.Pydest(api_data['key'])
-    item_manifest = await d2.decode_hash(hash, 'DestinyInventoryItemDefinition', language='ru')
+
+    langs = request.headers.get('accept-language')
+
+    if 'ru' in langs.split(';')[0].split(',')[0].replace('-', '_'):
+        lang = 'ru'
+    else:
+        lang = 'en'
+
+    item_manifest = await d2.decode_hash(hash, 'DestinyInventoryItemDefinition', language=lang)
     if 'screenshot' in item_manifest.keys():
         screenshot = '<img class="screenshot" src="https://bungie.net{}">'.format(item_manifest['screenshot'])
     else:
