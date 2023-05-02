@@ -112,10 +112,10 @@ async def dyn_daily(request):
 
     langs = request.headers.get('accept-language')
 
-    if 'ru' in langs.split(';')[0].split(',')[0].replace('-', '_'):
-        lang = 'ru'
-    else:
-        lang = 'en'
+    lang = 'en'
+    if langs is not None:
+        if 'ru' in langs.split(';')[0].split(',')[0].replace('-', '_'):
+            lang = 'ru'
 
     db_cursor.execute('''SELECT json, name, size, template, annotations FROM {} WHERE type='daily' ORDER BY place ASC'''.format(lang))
     data = db_cursor.fetchall()
