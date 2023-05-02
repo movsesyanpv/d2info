@@ -885,7 +885,7 @@ class D2data:
             class_items = 0
             n_order = 0
             for i, item in enumerate(tess_def['itemList']):
-                if n_items >= 4 and n_items - class_items / 3 * 2 >= 5:
+                if n_items >= 5 and n_items - class_items / 3 * 2 >= 5:
                     i_week = i_week + 1
                     shaders.append(list.copy(curr_week))
                     n_items = 0
