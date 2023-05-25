@@ -45,7 +45,7 @@ class D2info:
         await self.data.token_update()
         await self.data.get_chars()
         await self.data.get_seasonal_eververse()
-        await self.data.get_daily_rotations()
+        # await self.data.get_daily_rotations()
         # await self.data.get_weekly_rotations()
         await self.data.get_weekly_eververse()
 
@@ -72,7 +72,7 @@ class D2info:
         if self.args.production:
             app.run(host='0.0.0.0', port=1423, workers=1, debug=False, access_log=False)  # ssl={'cert': self.args.cert, 'key': self.args.key})
         else:
-            app.run()
+            app.run(host='0.0.0.0')
 
 
 if __name__ == '__main__':
