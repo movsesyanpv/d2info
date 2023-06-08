@@ -1,5 +1,6 @@
 from app import app, jinja
 from sanic import response
+from sanic.response import redirect
 import pydest
 import json
 import sqlite3
@@ -117,7 +118,7 @@ async def dyn_daily(request):
         if 'ru' in langs.split(';')[0].split(',')[0].replace('-', '_'):
             lang = 'ru'
 
-    db_cursor.execute('''SELECT json, name, size, template, annotations FROM {} WHERE type='daily' ORDER BY place ASC'''.format(lang))
+    db_cursor.execute('''SELECT json, name, size, template, annotations, background FROM {} WHERE type='daily' ORDER BY place ASC'''.format(lang))
     data = db_cursor.fetchall()
     for item in data:
         items.append({
@@ -127,6 +128,8 @@ async def dyn_daily(request):
             'template': item[3],
             'annotations': eval(item[4])
         })
+        if item[5]:
+            items[-1]['background'] = item[5]
 
     data_db.close()
     return jinja.render('daily.html', request, global_items=items)
@@ -228,6 +231,11 @@ async def seasonev(request):
         items = []
     data_db.close()
     return response.json({'Response': json.dumps(items, ensure_ascii=False)})
+
+
+@app.route('/item')
+async def item_legacy(request):
+    return redirect('/item/{}'.format(request.args['hash'][0]))
 
 
 @app.route('/item/<hash>')
