@@ -129,8 +129,8 @@ async def dyn_daily(request):
             'template': item[3],
             'annotations': eval(item[4])
         })
-        if item[5]:
-            items[-1]['background'] = item[5]
+        # if item[5]:
+        #     items[-1]['background'] = item[5]
 
     data_db.close()
     return jinja.render('daily.html', request, global_items=items)
