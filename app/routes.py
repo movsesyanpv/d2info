@@ -118,7 +118,8 @@ async def dyn_daily(request):
         if 'ru' in langs.split(';')[0].split(',')[0].replace('-', '_'):
             lang = 'ru'
 
-    db_cursor.execute('''SELECT json, name, size, template, annotations, background FROM {} WHERE type='daily' ORDER BY place ASC'''.format(lang))
+    # db_cursor.execute('''SELECT json, name, size, template, annotations, background FROM {} WHERE type='daily' ORDER BY place ASC'''.format(lang))
+    db_cursor.execute('''SELECT json, name, size, template, annotations FROM {} WHERE type='daily' ORDER BY place ASC'''.format(lang))
     data = db_cursor.fetchall()
     for item in data:
         items.append({
