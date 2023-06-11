@@ -145,12 +145,12 @@ async def dyn_weekly(request):
     db_cursor = data_db.cursor()
     items = []
 
+    lang = 'en'
     langs = request.headers.get('accept-language')
 
-    if 'ru' in langs.split(';')[0].split(',')[0].replace('-', '_'):
-        lang = 'ru'
-    else:
-        lang = 'en'
+    if langs is not None:
+        if 'ru' in langs.split(';')[0].split(',')[0].replace('-', '_'):
+            lang = 'ru'
 
     db_cursor.execute('''SELECT json, name, size, template, annotations FROM {} WHERE type='weekly' ORDER BY place ASC'''.format(lang))
     data = db_cursor.fetchall()
@@ -245,12 +245,13 @@ async def item(request, hash):
     api_data = json.loads(api_data_file.read())
     d2 = pydest.Pydest(api_data['key'])
 
+    lang = 'en'
     langs = request.headers.get('accept-language')
 
-    if 'ru' in langs.split(';')[0].split(',')[0].replace('-', '_'):
-        lang = 'ru'
-    else:
-        lang = 'en'
+    if langs is not None:
+        if 'ru' in langs.split(';')[0].split(',')[0].replace('-', '_'):
+            lang = 'ru'
+
 
     item_manifest = await d2.decode_hash(hash, 'DestinyInventoryItemDefinition', language=lang)
     if 'screenshot' in item_manifest.keys():
