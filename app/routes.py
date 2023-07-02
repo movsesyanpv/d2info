@@ -300,6 +300,7 @@ def sitemap(request):
 
     host_components = urlparse(request.url)
     host_base = host_components.scheme + "://" + host_components.netloc
+    host_base = 'https://d2info.happyv0dka.cloud'
 
     # Static routes with static content
     static_urls = list()
