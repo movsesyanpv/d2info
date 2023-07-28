@@ -20,7 +20,7 @@ async def index(request):
 
 @app.route('/indeedstor')
 @jinja.template('indeedstor.html')
-async def index(request):
+async def indeedstor(request):
     return {}
 
 
@@ -207,7 +207,7 @@ async def dailyrotations(request):
 
 
 @app.route('/api/weeklyrotations')
-async def dailyrotations(request):
+async def weeklyrotations(request):
     data_db = sqlite3.connect('data.db')
     data_cursor = data_db.cursor()
     data_cursor.execute('''SELECT items FROM weeklyrotations''')
