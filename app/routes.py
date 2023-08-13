@@ -236,7 +236,7 @@ async def seasonev(request):
 
 @app.route('/item')
 async def item_legacy(request):
-    return redirect('/item/{}'.format(request.args['hash'][0]))
+    return redirect('/item/{}'.format(request.args['hash'][0]), status=301)
 
 
 @app.route('/item/<hash>')
