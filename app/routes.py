@@ -334,5 +334,5 @@ def robots(request):
     host_base = 'https://d2info.happyv0dka.cloud'
     content = "Sitemap: {}/sitemap\n" \
               "User-agent: Googlebot\n" \
-              "Disallow: /item/".format(host_base, host_base)
+              "Disallow: /item/".format(host_base)
     return response.text(content)
