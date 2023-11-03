@@ -332,7 +332,7 @@ def robots(request):
     host_components = urlparse(request.url)
     host_base = host_components.scheme + "://" + host_components.netloc
     host_base = 'https://d2info.happyv0dka.cloud'
-    content = "Sitemap: {}/sitemap\n" \
+    content = "Sitemap: /sitemap\n" \
               "User-agent: Googlebot\n" \
-              "Disallow: {}/item/".format(host_base, host_base)
+              "Disallow: /item/".format(host_base, host_base)
     return response.text(content)
