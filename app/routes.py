@@ -323,3 +323,16 @@ def sitemap(request):
     #     dynamic_urls.append(url)
 
     return jinja.render("sitemap.xml", request, static_urls=static_urls, dynamic_urls=dynamic_urls, host_base=host_base)
+
+
+@app.route("/robots.txt")
+def robots(request):
+    from urllib.parse import urlparse
+
+    host_components = urlparse(request.url)
+    host_base = host_components.scheme + "://" + host_components.netloc
+    # host_base = 'https://d2info.happyv0dka.cloud'
+    content = "Sitemap: {}/sitemap\n" \
+              "User-agent: Googlebot\n" \
+              "Disallow: {}/item/*".format(host_base, host_base)
+    return response.text(content)
