@@ -821,24 +821,26 @@ class D2data:
         classnames = ["охотник", "варлок", "титан"]
 
         for lang in langs:
-
+            nweeks = 0
             n_items = 0
             curr_week = []
             i_week = 1
             class_items = 0
             n_order = 0
             for i, item in enumerate(tess_def['itemList']):
-                if n_items >= 5 and n_items - class_items / 3 * 2 >= 5:
-                    i_week = i_week + 1
-                    bd.append(list.copy(curr_week))
-                    n_items = 0
-                    curr_week = []
-                    class_items = 0
-                if item['displayCategoryIndex'] == 2 and item['itemHash'] not in [353932628, 3260482534, 3536420626,
+                # if n_items >= 5 and n_items - class_items / 3 * 2 >= 5:
+                #     i_week = i_week + 1
+                #     bd.append(list.copy(curr_week))
+                #     n_items = 0
+                #     curr_week = []
+                #     class_items = 0
+                if item['displayCategoryIndex'] == 9 and item['itemHash'] not in [353932628, 3260482534, 3536420626,
                                                                                   3187955025, 2638689062]:
                     definition = 'DestinyInventoryItemDefinition'
                     item_def = await self.destiny.decode_hash(item['itemHash'], definition, language=lang)
                     item_def = await self.destiny.decode_hash(item['itemHash'], definition, language=lang)
+                    if 'item.ghost_hologram' in item_def['traitIds']:
+                        nweeks += 1
                     if len(item['currencies']) > 0:
                         currency_resp = await self.destiny.decode_hash(item['currencies'][0]['itemHash'], definition,
                                                                        language=lang)
@@ -863,13 +865,44 @@ class D2data:
                                 'currency_icon': currency_resp['displayProperties']['icon'],
                                 'cost': item['currencies'][0]['quantity'],
                                 'currency_name': currency_resp['displayProperties']['name']
-                            }]
+                            }],
+                        'classType': item_def['classType'],
+                        'itemTypeDisplayName': item_def['itemTypeDisplayName'].lower()
                     })
                     n_order += 1
                     n_items = n_items + 1
                     if item_def['classType'] < 3 or any(
                             class_name in item_def['itemTypeDisplayName'].lower() for class_name in classnames):
                         class_items = class_items + 1
+            slots = []
+            curr_slot = []
+            n_items = 0
+            i_week = 0
+            class_items = 0
+            for item in curr_week:
+                if n_items >= nweeks and n_items - class_items / 3 * 2 >= nweeks:
+                    i_week = i_week + 1
+                    slots.append(list.copy(curr_slot))
+                    n_items = 0
+                    curr_slot = []
+                    class_items = 0
+                if item['classType'] < 3 or any(
+                            class_name in item['itemTypeDisplayName'].lower() for class_name in classnames):
+                    class_items = class_items + 1
+                curr_slot.append(item)
+                n_items += 1
+            slots.append(list.copy(curr_slot))
+            indexes = [0] * len(slots)
+            for i in range(0, nweeks):
+                curr_week = []
+                for slot in slots:
+                    if slot[indexes[slots.index(slot)]]['classType'] < 3 or any(class_name in slot[indexes[slots.index(slot)]]['itemTypeDisplayName'].lower() for class_name in classnames):
+                        curr_week = [*curr_week, *slot[indexes[slots.index(slot)]:indexes[slots.index(slot)] + 3]]
+                        indexes[slots.index(slot)] += 3
+                    else:
+                        curr_week.append(slot[indexes[slots.index(slot)]])
+                        indexes[slots.index(slot)] += 1
+                bd.append(list.copy(curr_week))
         return bd
 
     async def get_seasonal_shaders(self, langs, start):
@@ -991,31 +1024,33 @@ class D2data:
         classnames = ["охотник", "варлок", "титан"]
 
         for lang in langs:
-
+            nweeks = 0
             n_items = 0
             curr_week = []
             i_week = 1
             class_items = 0
             n_order = 0
             for i, item in enumerate(tess_def['itemList']):
-                if n_items >= 7 and n_items - class_items/3*2 >= 7:
-                    i_week = i_week + 1
-                    bd.append(list.copy(curr_week))
-                    n_items = 0
-                    curr_week = []
-                    class_items = 0
-                if item['displayCategoryIndex'] == 9 and item['itemHash'] not in [353932628, 3260482534, 3536420626,
+                # if n_items >= 5 and n_items - class_items/3*2 >= 5:
+                #     i_week = i_week + 1
+                #     bd.append(list.copy(curr_week))
+                #     n_items = 0
+                #     curr_week = []
+                #     class_items = 0
+                if item['displayCategoryIndex'] == 2 and item['itemHash'] not in [353932628, 3260482534, 3536420626,
                                                                                   3187955025, 2638689062]:
                     definition = 'DestinyInventoryItemDefinition'
                     item_def = await self.destiny.decode_hash(item['itemHash'], definition, language=lang)
                     item_def = await self.destiny.decode_hash(item['itemHash'], definition, language=lang)
+                    if 'item.spawnfx' in item_def['traitIds']:
+                        nweeks += 1
                     if len(item['currencies']) > 0:
                         currency_resp = await self.destiny.decode_hash(item['currencies'][0]['itemHash'], definition,
                                                                        language=lang)
                     else:
                         currency_resp = {'displayProperties': {'icon': '', 'name': ''}}
                         item['currencies'] = [{'quantity': ''}]
-                    cat_number = 9
+                    cat_number = 2
                     if 'screenshot' in item_def.keys():
                         screenshot = '<img alt="Screenshot" class="screenshot_hover" src="https://bungie.net{}" ' \
                                      'loading="lazy">'.format(item_def['screenshot'])
@@ -1033,13 +1068,43 @@ class D2data:
                                     'currency_icon': currency_resp['displayProperties']['icon'],
                                     'cost': item['currencies'][0]['quantity'],
                                     'currency_name': currency_resp['displayProperties']['name']
-                                }]
+                                }],
+                            'classType': item_def['classType'],
+                            'itemTypeDisplayName': item_def['itemTypeDisplayName']
                         })
                     n_order += 1
                     n_items = n_items + 1
                     if item_def['classType'] < 3 or any(
                             class_name in item_def['itemTypeDisplayName'].lower() for class_name in classnames):
                         class_items = class_items + 1
+            slots = []
+            curr_slot = []
+            n_items = 0
+            i_week = 0
+            for item in curr_week:
+                if n_items >= nweeks and n_items - class_items / 3 * 2 >= nweeks:
+                    i_week = i_week + 1
+                    slots.append(list.copy(curr_slot))
+                    n_items = 0
+                    curr_slot = []
+                    class_items = 0
+                if item['classType'] < 3 or any(
+                        class_name in item['itemTypeDisplayName'].lower() for class_name in classnames):
+                    class_items = class_items + 1
+                curr_slot.append(item)
+                n_items += 1
+            slots.append(list.copy(curr_slot))
+            indexes = [0] * len(slots)
+            for i in range(0, nweeks):
+                curr_week = []
+                for slot in slots:
+                    if slot[indexes[slots.index(slot)]]['classType'] < 3 or any(class_name in slot[indexes[slots.index(slot)]]['itemTypeDisplayName'].lower() for class_name in classnames):
+                        curr_week = [*curr_week, *slot[indexes[slots.index(slot)]:indexes[slots.index(slot)] + 3]]
+                        indexes[slots.index(slot)] += 3
+                    else:
+                        curr_week.append(slot[indexes[slots.index(slot)]])
+                        indexes[slots.index(slot)] += 1
+                bd.append(list.copy(curr_week))
         return bd
 
     async def get_weekly_eververse(self):
@@ -1050,9 +1115,9 @@ class D2data:
         featured_bd = await self.get_seasonal_featured_bd(langs, start)
         # shaders = await self.get_seasonal_shaders(langs, start)
         # transmat = await self.get_seasonal_transmats(langs, start)
-        silver = await self.get_seasonal_featured_silver(langs, start)
+        # silver = await self.get_seasonal_featured_silver(langs, start)
         week_n = datetime.now(tz=timezone.utc) - await self.get_season_start()
-        week_n = int(week_n.days / 7)
+        week_n = int(week_n.days / 7) - 14
 
         for i in range(0, len(bd)):
             if week_n == i:
@@ -1066,9 +1131,9 @@ class D2data:
         if len(bd) == len(featured_bd):
             for i in range(0, len(bd)):
                 data[i]['items'] = [*data[i]['items'], *featured_bd[i]]
-        if len(bd) == len(silver):
-            for i in range(0, len(bd)):
-                data[i]['items'] = [*data[i]['items'], *silver[i]]
+        # if len(bd) == len(silver):
+        #     for i in range(0, len(bd)):
+        #         data[i]['items'] = [*data[i]['items'], *silver[i]]
 
         self.data_cursor.execute('''DROP TABLE evweekly''')
         self.data_cursor.execute('''CREATE TABLE "evweekly" ("items"	TEXT)''')
