@@ -62,6 +62,13 @@ async def status(request):
             'annotations': eval(item[4])
         })
 
+    lang = 'en'
+    langs = request.headers.get('accept-language')
+
+    if langs is not None:
+        if 'ru' in langs.split(';')[0].split(',')[0].replace('-', '_'):
+            lang = 'ru'
+
     data_db.close()
     return jinja.render('status.html', request, global_items={'loc': translations[lang], 'data': items})
 
