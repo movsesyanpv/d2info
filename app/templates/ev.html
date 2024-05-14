@@ -1,12 +1,12 @@
 {% extends 'hoverrotations.html' %}
 
 {% block head %}
-{% block title %}Сезонный Эверверс{% endblock %}
+{% block title %}{{global_items['loc']['evs_title']}}{% endblock %}
 
 {% block meta %}
-<meta name="description" content="Сезонный ассортимент Эверверс"/>
-<meta property="og:description" content="Предметы, которые будут продаваться в этом сезоне у Тесс Эверис" />
-<meta property="og:title" content="Сезонный Эверверс" />
+<meta name="description" content="{{global_items['loc']['seo_evsdesc']}}"/>
+<meta property="og:description" content="{{global_items['loc']['seo_evsdescl']}}" />
+<meta property="og:title" content="{{global_items['loc']['seo_evstitle']}}" />
 <meta property="og:type" content="website" />
 <meta property="og:url" content="https://d2info.happyv0dka.cloud/eververse" />
 {% endblock %}

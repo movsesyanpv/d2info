@@ -4,7 +4,7 @@
 
 {% block content %}
 <div class="mod_grid">
-    {% for global_item in global_items %}
+    {% for global_item in global_items['data'] %}
     {% include global_item['template'] %}
     {% endfor %}
 </div>

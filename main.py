@@ -54,12 +54,12 @@ class D2info:
         @app.listener('before_server_start')
         async def instantiate_scheduler(app, loop):
             self.sched = AsyncIOScheduler(timezone='UTC')
-            self.sched.add_job(self.init_data, misfire_grace_time=86300)
-            self.sched.add_job(self.data.token_update, 'interval', hours=1)
-            self.sched.add_job(self.data.get_seasonal_eververse, 'cron', day_of_week='tue', hour='17', minute='1',
-                               second='40', misfire_grace_time=86300)
-            self.sched.add_job(self.data.get_weekly_eververse, 'cron', day_of_week='tue', hour='17', minute='1',
-                               second='40', misfire_grace_time=86300)
+            # self.sched.add_job(self.init_data, misfire_grace_time=86300)
+            # self.sched.add_job(self.data.token_update, 'interval', hours=1)
+            # self.sched.add_job(self.data.get_seasonal_eververse, 'cron', day_of_week='tue', hour='17', minute='1',
+            #                    second='40', misfire_grace_time=86300)
+            # self.sched.add_job(self.data.get_weekly_eververse, 'cron', day_of_week='tue', hour='17', minute='1',
+            #                    second='40', misfire_grace_time=86300)
             # self.sched.add_job(self.data.get_weekly_rotations, 'cron', day_of_week='tue', hour='17', minute='0',
             #                    second='40', misfire_grace_time=86300)
             # self.sched.add_job(self.data.get_daily_rotations, 'cron', hour='17', minute='0', second='40',

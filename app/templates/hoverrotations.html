@@ -10,7 +10,7 @@
 {% block content %}
 <div class="content-center">
 <div class="global_grid" style="{{ global_style }}">
-    {% for global_item in global_items %}
+    {% for global_item in global_items['data'] %}
         {% include 'hover_items.html' %}
     {% endfor %}
 </div>

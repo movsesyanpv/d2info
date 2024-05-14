@@ -17,21 +17,21 @@
     <div class="header-limiter">
 		<h1><a href="/">d2info</a></h1>
 		<nav>
-            <a href="/daily">Сегодня</a>
-            <a href="/weekly">На этой неделе</a>
+            <a href="/daily">{{global_items['loc']['today']}}</a>
+            <a href="/weekly">{{global_items['loc']['weekly']}}</a>
 <!--			<a href="/eververse">Эверверс</a>-->
 			<li class="dropdown">
-				<a href="#" class="dropbtn">Эверверс</a>
+				<a href="#" class="dropbtn">{{global_items['loc']['ev']}}</a>
 				<div class="dropdown-content">
-					<a class="drop" href="/eververse">Сезонный</a>
-					<a class="drop" href="/evweekly">Еженедельный</a>
+					<a class="drop" href="/eververse">{{global_items['loc']['evs']}}</a>
+					<a class="drop" href="/evweekly">{{global_items['loc']['evweekly']}}</a>
 				</div>
 			</li>
 			<li class="dropdown">
 				<a href="#" class="dropbtn">Indeedstor</a>
 				<div class="dropdown-content">
-					<a class="drop" href="/indeedstor">О боте</a>
-					<a class="drop" href="/bot_status">Статус</a>
+					<a class="drop" href="/indeedstor">{{global_items['loc']['bot_info']}}</a>
+					<a class="drop" href="/bot_status">{{global_items['loc']['bot_status']}}</a>
 				</div>
 			</li>
 		</nav>

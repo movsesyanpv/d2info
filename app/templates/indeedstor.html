@@ -1,10 +1,10 @@
 {% extends 'base.html' %}
 
-{% block title %}d2info{% endblock %}
+{% block title %}Indeedstor{% endblock %}
 
 {% block meta %}
-<meta name="description" content="Indeedstor (Дустанатор) - бот для Destiny 2"/>
-<meta property="og:description" content="Indeedstor (Дустанатор) - бот для Destiny 2" />
+<meta name="description" content="{{global_items['loc']['seo_botdesc']}}"/>
+<meta property="og:description" content="{{global_items['loc']['seo_botdesc']}}" />
 <meta property="og:title" content="Indeedstor" />
 <meta property="og:type" content="website" />
 <meta property="og:url" content="https://d2info.happyv0dka.cloud/indeedstor" />
@@ -22,35 +22,31 @@
             <img src="/static/autopost_screenshot.png" style="max-height: 600px; padding-top: 10px; margin-left: auto; margin-right: auto;  display: block; max-width: 100%">
         </div>
         <div class="tall" id="main_point" style="align-self: end;">
-            <h1>Indeedstor (Дустанатор) - бот для Destiny 2</h1>
+            <h1>{{global_items['loc']['bot_header']}}</h1>
             <p>
-                <a href="https://discord.com/oauth2/authorize?client_id=677145368894373965&permissions=395204623424&scope=bot%20applications.commands">Indeedstor (Дустанатор)</a> - многофункциональный бот по Destiny 2. Он предоставляет актуальную информацию о мире игры. С помощью бота можно строить клановые списки лидеров и организовывать сборы в активности.
+                <a href="https://discord.com/oauth2/authorize?client_id=677145368894373965&permissions=395204623424&scope=bot%20applications.commands">{{global_items['loc']['index_bot']}}</a>{{global_items['loc']['bot_desc']}}
             </p>
-            <a href="https://discord.gg/JEbzECp" class="button">Сервер Discord</a>
-            <a href="https://discord.com/oauth2/authorize?client_id=677145368894373965&permissions=395204623424&scope=bot%20applications.commands" class="button">Добавить бота</a>
+            <a href="https://discord.gg/JEbzECp" class="button">{{global_items['loc']['bot_discord']}}</a>
+            <a href="https://discord.com/oauth2/authorize?client_id=677145368894373965&permissions=395204623424&scope=bot%20applications.commands" class="button">{{global_items['loc']['bot_add']}}</a>
         </div>
     </div>
-    <h1 align="center" style="padding-top: 10px">Возможности</h1>
+    <h1 align="center" style="padding-top: 10px">{{global_items['loc']['bot_features']}}</h1>
     <div class="mod_grid">
         <div>
-            <h2>Информация о ресетах</h2>
-            <p>После каждого ресета бот отправляет информацию о мире Destiny 2 в зарегистрированные каналы</p>
+            <h2>{{global_items['loc']['bot_resetst']}}</h2>
+            <p>{{global_items['loc']['bot_resets']}}</p>
         </div>
         <div>
-            <h2>Списки лидеров клана</h2>
-            <p>Можно строить рейтинги членов клана по любым метрикам, которые можно надеть на эмблему в игре</p>
+            <h2>{{global_items['loc']['bot_leadert']}}</h2>
+            <p>{{global_items['loc']['bot_leader']}}</p>
         </div>
         <div>
-            <h2>Организация сборов</h2>
-            <p>Создавайте сборы в активности. Для добавления в список достаточно нажать на соответствующую кнопку под сбором. Возможно ручное одобрение желающих</p>
+            <h2>{{global_items['loc']['bot_lfgt']}}</h2>
+            <p>{{global_items['loc']['bot_lfg']}}</p>
         </div>
         <div>
-            <h2>Слеш-команды</h2>
-            <p>Бот полностью поддерживает слеш-команды</p>
-        </div>
-        <div>
-            <h2>Многоязычность</h2>
-            <p>Бот поддерживает те же языки, что и Destiny 2. Локализация выполнена пользователями бота</p>
+            <h2>{{global_items['loc']['bot_localet']}}</h2>
+            <p>{{global_items['loc']['bot_locale']}}</p>
         </div>
     </div>
 </div>

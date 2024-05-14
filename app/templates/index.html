@@ -3,8 +3,8 @@
 {% block title %}d2info{% endblock %}
 
 {% block meta %}
-<meta name="description" content="Полезная информация о Destiny 2"/>
-<meta property="og:description" content="Полезная информация о Destiny 2" />
+<meta name="description" content="{{global_items['loc']['seo_indexdesc']}}"/>
+<meta property="og:description" content="{{global_items['loc']['seo_indexdesc']}}" />
 <meta property="og:title" content="d2info" />
 <meta property="og:type" content="website" />
 <meta property="og:url" content="https://d2info.happyv0dka.cloud/" />
@@ -12,29 +12,29 @@
 
 {% block content %}
 <div class="content-center" style="max-width: 1200px">
-    <h1>Добро пожаловать на d2info!</h1>
+    <h1>{{global_items['loc']['index_h']}}</h1>
     <p>
-        Сайт предоставляет информацию о ресетах, как бот <a href="https://discord.com/oauth2/authorize?client_id=677145368894373965&permissions=395204623424&scope=bot%20applications.commands">Indeedstor (Дустанатор)</a>,
-        однако к этой информации добавляется сезонный ассортимент Эверверс.
+        {{global_items['loc']['index_desc1']}} <a href="https://discord.com/oauth2/authorize?client_id=677145368894373965&permissions=395204623424&scope=bot%20applications.commands">{{global_items['loc']['index_bot']}}</a>,
+        {{global_items['loc']['index_desc2']}}
     </p>
 </div>
-<h1 align="center" style="padding-top: 10px">Основные страницы</h1>
+<h1 align="center" style="padding-top: 10px">{{global_items['loc']['index_pages']}}</h1>
 <div class="mod_grid" style="max-width: 1200px">
     <div>
-        <b><a href="/daily">Ежедневный ресет</a></b><br>
-        <p>Ежедневно обновляемая информация, например, обмен материалов и моды Ады и Банши</p>
+        <b><a href="/daily">{{global_items['loc']['index_dailyt']}}</a></b><br>
+        <p>{{global_items['loc']['index_daily']}}</p>
     </div>
     <div>
-        <b><a href="/weekly">Еженедельный ресет</a></b><br>
-        <p>Ежеедельно обновляемая информация, например, испытания рейдов и ассортимент Эверверс</p>
+        <b><a href="/weekly">{{global_items['loc']['index_weeklyt']}}</a></b><br>
+        <p>{{global_items['loc']['index_weekly']}}</p>
     </div>
     <div>
-        <b><a href="/evweekly">Календарь Эверверс</a></b><br>
-        <p>Какие предметы будут продаваться в этом сезоне в Эверверс, отсортированные по неделям</p>
+        <b><a href="/evweekly">{{global_items['loc']['index_evt']}}</a></b><br>
+        <p>{{global_items['loc']['index_ev']}}</p>
     </div>
     <div>
-        <b><a href="/indeedstor">Бот Indeedstor</a></b><br>
-        <p>Информация о дискорд-боте</p>
+        <b><a href="/indeedstor">{{global_items['loc']['index_botit']}}</a></b><br>
+        <p>{{global_items['loc']['index_boti']}}</p>
     </div>
 </div>
 {% endblock %}

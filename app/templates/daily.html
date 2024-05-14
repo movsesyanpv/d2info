@@ -1,7 +1,7 @@
 {% extends 'rotations.html' %}
 
 {% block head %}
-{% block title %}Сегодня в игре{% endblock %}
+{% block title %}{{global_items['loc']['daily_title']}}{% endblock %}
 
 {% block scripts %}
 <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.5.1/jquery.min.js" defer></script>
@@ -9,9 +9,9 @@
 {% endblock %}
 
 {% block meta %}
-<meta name="description" content="Информация о ежедневном сбросе Destiny 2"/>
-<meta property="og:description" content="Информация о ежедневном сбросе Destiny 2" />
-<meta property="og:title" content="Сегодня в игре" />
+<meta name="description" content="{{global_items['loc']['seo_dailydesc']}}"/>
+<meta property="og:description" content="{{global_items['loc']['seo_dailydesc']}}" />
+<meta property="og:title" content="{{global_items['loc']['seo_dailytitle']}}" />
 <meta property="og:type" content="website" />
 <meta property="og:url" content="https://d2info.happyv0dka.cloud/daily" />
 {% endblock %}
