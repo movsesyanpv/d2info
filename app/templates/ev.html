@@ -3,6 +3,12 @@
 {% block head %}
 {% block title %}{{global_items['loc']['evs_title']}}{% endblock %}
 
+{% block locales %}
+<link rel="alternate" hreflang="en" href="https://d2info.happyv0dka.cloud/eververse/en" />
+<link rel="alternate" hreflang="ru" href="https://d2info.happyv0dka.cloud/eververse/ru" />
+<link rel="alternate" hreflang="x-default" href="https://d2info.happyv0dka.cloud/eververse" />
+{% endblock %}
+
 {% block meta %}
 <meta name="description" content="{{global_items['loc']['seo_evsdesc']}}"/>
 <meta property="og:description" content="{{global_items['loc']['seo_evsdescl']}}" />

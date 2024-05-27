@@ -2,6 +2,12 @@
 
 {% block title %}d2info{% endblock %}
 
+{% block locales %}
+<link rel="alternate" hreflang="en" href="https://d2info.happyv0dka.cloud/en" />
+<link rel="alternate" hreflang="ru" href="https://d2info.happyv0dka.cloud/ru" />
+<link rel="alternate" hreflang="x-default" href="https://d2info.happyv0dka.cloud/" />
+{% endblock %}
+
 {% block meta %}
 <meta name="description" content="{{global_items['loc']['seo_indexdesc']}}"/>
 <meta property="og:description" content="{{global_items['loc']['seo_indexdesc']}}" />

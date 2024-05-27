@@ -3,6 +3,12 @@
 {% block head %}
 {% block title %}{{global_items['loc']['evw_title']}}{% endblock %}
 
+{% block locales %}
+<link rel="alternate" hreflang="en" href="https://d2info.happyv0dka.cloud/evweekly/en" />
+<link rel="alternate" hreflang="ru" href="https://d2info.happyv0dka.cloud/evweekly/ru" />
+<link rel="alternate" hreflang="x-default" href="https://d2info.happyv0dka.cloud/evweekly" />
+{% endblock %}
+
 {% block meta %}
 <meta name="description" content="{{global_items['loc']['seo_evwdesc']}}"/>
 <meta property="og:description" content="{{global_items['loc']['seo_evwdescl']}}" />

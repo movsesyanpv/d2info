@@ -18,28 +18,52 @@ for lang in ['en', 'ru']:
     translations_file.close()
 
 
+def lang_check(lang):
+    if lang in translations.keys():
+        return True
+    else:
+        return False
+
+
 @app.route('/')
 @jinja.template('index.html')
-async def index(request):
+async def index_(request):
     langs = request.headers.get('accept-language')
 
     lang = 'en'
     if langs is not None:
         if 'ru' in langs.split(';')[0].split(',')[0].replace('-', '_'):
             lang = 'ru'
-    return jinja.render('index.html', request, global_items={'loc': translations[lang]})
+    return redirect('/{}'.format(lang), status=302)
+
+
+@app.route('/<lang>')
+@jinja.template('index.html')
+async def index(request, lang):
+    if lang_check(lang):
+        return jinja.render('index.html', request, global_items={'loc': translations[lang], 'lang': lang})
+    else:
+        return redirect('/', status=302)
 
 
 @app.route('/indeedstor')
-@jinja.template('indeedstor.html')
-async def indeedstor(request):
+async def indeedstor_(request):
     langs = request.headers.get('accept-language')
 
     lang = 'en'
     if langs is not None:
         if 'ru' in langs.split(';')[0].split(',')[0].replace('-', '_'):
             lang = 'ru'
-    return jinja.render('indeedstor.html', request, global_items={'loc': translations[lang]})
+    return redirect('/indeedstor/{}'.format(lang), status=302)
+
+
+@app.route('/indeedstor/<lang>')
+@jinja.template('indeedstor.html')
+async def indeedstor(request, lang):
+    if lang_check(lang):
+        return jinja.render('indeedstor.html', request, global_items={'loc': translations[lang], 'lang': lang})
+    else:
+        return redirect('/indeedstor')
 
 
 @app.route('/bot_status')
@@ -70,65 +94,79 @@ async def status(request):
             lang = 'ru'
 
     data_db.close()
-    return jinja.render('status.html', request, global_items={'loc': translations[lang], 'data': items})
+    return jinja.render('status.html', request, global_items={'loc': translations[lang], 'data': items, 'lang': lang})
+
+
+@app.route('/eververse/<lang>')
+@jinja.template('ev.html')
+async def eververse(request, lang):
+    if lang_check(lang):
+        data_db = mariadb.connect(host=api_data['db_host'], user=api_data['cache_login'],
+                                  password=api_data['pass'], port=api_data['db_port'],
+                                  database=api_data['data_db'])
+        db_cursor = data_db.cursor()
+
+        db_cursor.execute(
+            '''SELECT json, name, size, template, annotations FROM {} WHERE type='season_ev' ORDER BY place ASC'''.format(
+                lang))
+        items = db_cursor.fetchone()
+        if items is not None:
+            items = eval(items[0])
+        else:
+            items = {
+                'name': 'Нет данных. Проверьте позднее.',
+                'items': []
+            }
+        data_db.close()
+        return jinja.render('ev.html', request, global_items={'loc': translations[lang], 'data': items['data'], 'lang': lang})
+    else:
+        return redirect('/eververse')
 
 
 @app.route('/eververse')
-@jinja.template('ev.html')
-async def eververse(request):
-    data_db = mariadb.connect(host=api_data['db_host'], user=api_data['cache_login'],
-                              password=api_data['pass'], port=api_data['db_port'],
-                              database=api_data['data_db'])
-    db_cursor = data_db.cursor()
-
+async def eververse_(request):
     langs = request.headers.get('accept-language')
 
     lang = 'en'
     if langs is not None:
         if 'ru' in langs.split(';')[0].split(',')[0].replace('-', '_'):
             lang = 'ru'
+    return redirect('/eververse/{}'.format(lang), status=302)
 
-    db_cursor.execute(
-        '''SELECT json, name, size, template, annotations FROM {} WHERE type='season_ev' ORDER BY place ASC'''.format(
-            lang))
-    items = db_cursor.fetchone()
-    if items is not None:
-        items = eval(items[0])
+
+@app.route('/evweekly/<lang>')
+@jinja.template('evweekly.html')
+async def ev_weekly(request, lang):
+    if lang_check(lang):
+        data_db = mariadb.connect(host=api_data['db_host'], user=api_data['cache_login'],
+                                  password=api_data['pass'], port=api_data['db_port'],
+                                  database=api_data['data_db'])
+        db_cursor = data_db.cursor()
+
+        db_cursor.execute('''SELECT json, name, size, template, annotations FROM {} WHERE type='weekly_ev' ORDER BY place ASC'''.format(lang))
+        items = db_cursor.fetchone()
+        if items is not None:
+            items = eval(items[0])
+        else:
+            items = [{
+                'name': 'Нет данных, или они пока что не предоставляются. Проверьте позднее.',
+                'items': []
+            }]
+        data_db.close()
+        return jinja.render('evweekly.html', request, global_items={'loc': translations[lang], 'data': items['data'], 'lang': lang}, item_style='max-width: 400px', global_style='grid-template-columns: repeat(auto-fit, minmax(250px,1fr))')
     else:
-        items = {
-            'name': 'Нет данных. Проверьте позднее.',
-            'items': []
-        }
-    data_db.close()
-    return jinja.render('ev.html', request, global_items={'loc': translations[lang], 'data': items['data']})
+        return redirect('/evweekly')
 
 
 @app.route('/evweekly')
-@jinja.template('evweekly.html')
-async def ev_weekly(request):
-    data_db = mariadb.connect(host=api_data['db_host'], user=api_data['cache_login'],
-                              password=api_data['pass'], port=api_data['db_port'],
-                              database=api_data['data_db'])
-    db_cursor = data_db.cursor()
-
+async def evweekly_(request):
     langs = request.headers.get('accept-language')
 
     lang = 'en'
     if langs is not None:
         if 'ru' in langs.split(';')[0].split(',')[0].replace('-', '_'):
             lang = 'ru'
-
-    db_cursor.execute('''SELECT json, name, size, template, annotations FROM {} WHERE type='weekly_ev' ORDER BY place ASC'''.format(lang))
-    items = db_cursor.fetchone()
-    if items is not None:
-        items = eval(items[0])
-    else:
-        items = [{
-            'name': 'Нет данных, или они пока что не предоставляются. Проверьте позднее.',
-            'items': []
-        }]
-    data_db.close()
-    return jinja.render('evweekly.html', request, global_items={'loc': translations[lang], 'data': items['data']}, item_style='max-width: 400px', global_style='grid-template-columns: repeat(auto-fit, minmax(250px,1fr))')
+    return redirect('/evweekly/{}'.format(lang), status=302)
 
 
 @app.route('/v1/daily')
@@ -149,69 +187,82 @@ async def daily(request):
     return jinja.render('daily.html', request, global_items={'loc': translations[lang], 'data': items})
 
 
-@app.route('/daily')
+@app.route('/daily/<lang>')
 @jinja.template('daily.html')
-async def dyn_daily(request):
-    data_db = mariadb.connect(host=api_data['db_host'], user=api_data['cache_login'],
-                              password=api_data['pass'], port=api_data['db_port'],
-                              database=api_data['data_db'])
-    db_cursor = data_db.cursor()
-    items = []
+async def dyn_daily(request, lang):
+    if lang_check(lang):
+        data_db = mariadb.connect(host=api_data['db_host'], user=api_data['cache_login'],
+                                  password=api_data['pass'], port=api_data['db_port'],
+                                  database=api_data['data_db'])
+        db_cursor = data_db.cursor()
+        items = []
 
+        # db_cursor.execute('''SELECT json, name, size, template, annotations, background FROM {} WHERE type='daily' ORDER BY place ASC'''.format(lang))
+        db_cursor.execute('''SELECT json, name, size, template, annotations FROM {} WHERE type='daily' ORDER BY place ASC'''.format(lang))
+        data = db_cursor.fetchall()
+        for item in data:
+            items.append({
+                'name': item[1],
+                'size': item[2],
+                'items': json.loads(item[0])['data'],
+                'template': item[3],
+                'annotations': eval(item[4])
+            })
+            # if item[5]:
+            #     items[-1]['background'] = item[5]
+
+        data_db.close()
+        return jinja.render('daily.html', request, global_items={'loc': translations[lang], 'data': items, 'lang': lang})
+    else:
+        return redirect('/daily')
+
+@app.route('/daily')
+async def dyn_daily_(request):
     langs = request.headers.get('accept-language')
 
     lang = 'en'
     if langs is not None:
         if 'ru' in langs.split(';')[0].split(',')[0].replace('-', '_'):
             lang = 'ru'
+    return redirect('/daily/{}'.format(lang), status=302)
 
-    # db_cursor.execute('''SELECT json, name, size, template, annotations, background FROM {} WHERE type='daily' ORDER BY place ASC'''.format(lang))
-    db_cursor.execute('''SELECT json, name, size, template, annotations FROM {} WHERE type='daily' ORDER BY place ASC'''.format(lang))
-    data = db_cursor.fetchall()
-    for item in data:
-        items.append({
-            'name': item[1],
-            'size': item[2],
-            'items': json.loads(item[0])['data'],
-            'template': item[3],
-            'annotations': eval(item[4])
-        })
-        # if item[5]:
-        #     items[-1]['background'] = item[5]
 
-    data_db.close()
-    return jinja.render('daily.html', request, global_items={'loc': translations[lang], 'data': items})
+@app.route('/weekly/<lang>')
+@jinja.template('weekly.html')
+async def dyn_weekly(request, lang):
+    if lang_check(lang):
+        data_db = mariadb.connect(host=api_data['db_host'], user=api_data['cache_login'],
+                                  password=api_data['pass'], port=api_data['db_port'],
+                                  database=api_data['data_db'])
+        db_cursor = data_db.cursor()
+        items = []
+
+        db_cursor.execute('''SELECT json, name, size, template, annotations FROM {} WHERE type='weekly' ORDER BY place ASC'''.format(lang))
+        data = db_cursor.fetchall()
+        for item in data:
+            items.append({
+                'name': item[1],
+                'size': item[2],
+                'items': json.loads(item[0])['data'],
+                'template': item[3],
+                'annotations': eval(item[4])
+            })
+
+        data_db.close()
+        return jinja.render('weekly.html', request, global_items={'loc': translations[lang], 'data': items, 'lang': lang})
+    else:
+        return redirect('/weekly')
 
 
 @app.route('/weekly')
-@jinja.template('weekly.html')
-async def dyn_weekly(request):
-    data_db = mariadb.connect(host=api_data['db_host'], user=api_data['cache_login'],
-                              password=api_data['pass'], port=api_data['db_port'],
-                              database=api_data['data_db'])
-    db_cursor = data_db.cursor()
-    items = []
-
-    lang = 'en'
+async def dyn_weekly_(request):
     langs = request.headers.get('accept-language')
 
+    lang = 'en'
     if langs is not None:
         if 'ru' in langs.split(';')[0].split(',')[0].replace('-', '_'):
             lang = 'ru'
-
-    db_cursor.execute('''SELECT json, name, size, template, annotations FROM {} WHERE type='weekly' ORDER BY place ASC'''.format(lang))
-    data = db_cursor.fetchall()
-    for item in data:
-        items.append({
-            'name': item[1],
-            'size': item[2],
-            'items': json.loads(item[0])['data'],
-            'template': item[3],
-            'annotations': eval(item[4])
-        })
-
-    data_db.close()
-    return jinja.render('weekly.html', request, global_items={'loc': translations[lang], 'data': items})
+    return redirect('/weekly/{}'.format(lang), status=302)
 
 
 @app.route('/v1/weekly')
